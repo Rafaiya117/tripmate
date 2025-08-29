@@ -1,0 +1,386 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:trip_mate/config/colors/colors.dart';
+import 'package:trip_mate/features/history/controllers/history_details_controller.dart';
+import 'package:trip_mate/features/history/widgets/rich_text_widget.dart';
+
+class HistoryDetailsScreen extends StatelessWidget {
+  final String historyId;
+
+  const HistoryDetailsScreen({
+    super.key,
+    required this.historyId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HistoryDetailsController>(
+      builder: (context, controller, child) {
+        // Load details when screen is first built
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (controller.historyDetails?.id != historyId) {
+            controller.loadHistoryDetails(historyId);
+          }
+        });
+
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor2,
+          body: _buildBody(context, controller),
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(BuildContext context, HistoryDetailsController controller) {
+    if (controller.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (controller.errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 48.sp,
+              color: AppColors.disabled1,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              controller.errorMessage!,
+              style: GoogleFonts.inter(
+                color: AppColors.disabled1,
+                fontSize: 16.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 16.h),
+            ElevatedButton(
+              onPressed: () => controller.loadHistoryDetails(historyId),
+              child: Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final details = controller.historyDetails;
+    if (details == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return CustomScrollView(
+      slivers: [
+        // App Bar with Image
+        SliverAppBar(
+          expandedHeight: 300.h,
+          floating: false,
+          pinned: true,
+          backgroundColor: AppColors.backgroundColor2,
+          leading: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              margin: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.arrow_back,
+                color: AppColors.iconColor,
+                size: 20.sp,
+              ),
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                // Handle delete action
+                _showDeleteDialog(context);
+              },
+              child: Container(
+                margin: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: 20.sp,
+                ),
+              ),
+            ),
+          ],
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(details.imageUrl),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.3),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // Content
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                Text(
+                  details.title,
+                  style: GoogleFonts.inter(
+                    color: AppColors.textColor1,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                
+                SizedBox(height: 16.h),
+                
+                // Metadata Row
+                Row(
+                  children: [
+                    // Location
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 16.sp,
+                          color: AppColors.iconColor,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          details.location,
+                          style: GoogleFonts.inter(
+                            color: AppColors.textColor1,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    SizedBox(width: 24.w),
+                    
+                    // Year
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.business,
+                          size: 16.sp,
+                          color: AppColors.iconColor,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          details.year,
+                          style: GoogleFonts.inter(
+                            color: AppColors.textColor1,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                
+                SizedBox(height: 24.h),
+                
+                // Description
+                RichTextWidget(
+                  text: details.description,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+                
+                SizedBox(height: 24.h),
+                
+                // Location Section
+                _buildSection(
+                  'Location',
+                  details.location,
+                  Icons.location_on,
+                ),
+                
+                SizedBox(height: 16.h),
+                
+                // Construction Section
+                _buildSection(
+                  'Construction',
+                  details.construction,
+                  Icons.construction,
+                ),
+                
+                SizedBox(height: 16.h),
+                
+                // Unfinished Structure Section
+                _buildSection(
+                  'Unfinished Structure',
+                  details.unfinishedStructure,
+                  Icons.architecture,
+                ),
+                
+                SizedBox(height: 24.h),
+                
+                // Visiting Hours Section
+                _buildVisitingHoursSection(details.visitingHours),
+                
+                SizedBox(height: 24.h),
+                
+                // Additional Info Section
+                if (details.additionalInfo.isNotEmpty) ...[
+                  RichTextWidget(
+                    text: details.additionalInfo,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  
+                  SizedBox(height: 24.h),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSection(String title, String content, IconData icon) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              icon,
+              size: 18.sp,
+              color: AppColors.highlight,
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                color: AppColors.highlight,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.h),
+        RichTextWidget(
+          text: content,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVisitingHoursSection(String visitingHours) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.access_time,
+              size: 18.sp,
+              color: AppColors.highlight,
+            ),
+            SizedBox(width: 8.w),
+            Text(
+              'Visiting Hours',
+              style: GoogleFonts.inter(
+                color: AppColors.highlight,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            Text(
+              ' (approx.):',
+              style: GoogleFonts.inter(
+                color: AppColors.textColor1,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        RichTextWidget(
+          text: visitingHours,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete History',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to delete this history item?',
+            style: GoogleFonts.inter(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Go back to history list
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('History item deleted'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
