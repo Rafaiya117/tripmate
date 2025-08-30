@@ -25,8 +25,8 @@ class SplashController extends ChangeNotifier {
       _model.setInitialized(true);
       notifyListeners();
       
-      // Navigate to login page after splash
-      SplashService.navigateToLogin(context);
+      // Navigate to camera page after splash
+      SplashService.navigateToCamera(context);
     });
   }
 

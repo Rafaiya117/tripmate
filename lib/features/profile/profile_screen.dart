@@ -356,36 +356,80 @@ class ProfileScreen extends StatelessWidget {
   void _showLogoutDialog(BuildContext context, ProfileController controller) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Logout',
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Text(
-            'Are you sure you want to logout?',
-            style: GoogleFonts.inter(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await controller.logout();
-                // Navigate to login screen
-                Navigator.of(context).pushReplacementNamed('/login_page');
-              },
-              child: Text(
-                'Logout',
-                style: TextStyle(color: Colors.red),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
               ),
-            ),
-          ],
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.logout,
+                    color: Colors.red.shade600,
+                    size: 24.sp,
+                  ),
+                  SizedBox(width: 12.w),
+                  Text(
+                    'Logout',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18.sp,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                'Are you sure you want to logout from your account?',
+                style: GoogleFonts.inter(
+                  fontSize: 16.sp,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: controller.isLoading ? null : () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.inter(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                                 TextButton(
+                   onPressed: controller.isLoading ? null : () async {
+                     setState(() {
+                       // Show loading state in dialog
+                     });
+                     await controller.logout(context);
+                     Navigator.of(context).pop();
+                     // Navigate to login screen using go_router
+                     context.go('/login_page');
+                   },
+                  child: controller.isLoading
+                      ? SizedBox(
+                          width: 16.w,
+                          height: 16.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red.shade600),
+                          ),
+                        )
+                      : Text(
+                          'Logout',
+                          style: GoogleFonts.inter(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.red.shade600,
+                          ),
+                        ),
+                ),
+              ],
+            );
+          },
         );
       },
     );

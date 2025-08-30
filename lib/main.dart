@@ -12,6 +12,7 @@ import 'package:trip_mate/features/splash/controllers/animation_controller.dart'
 import 'package:trip_mate/features/camera/camera.dart';
 import 'package:trip_mate/features/history/history.dart';
 import 'package:trip_mate/features/profile/profile.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -64,6 +65,7 @@ class _MyAppState extends State<MyApp>{
           ChangeNotifierProvider(create: (_) => EditProfileController()),
           ChangeNotifierProvider(create: (_) => PrivacyPolicyController()),
           ChangeNotifierProvider(create: (_) => SubscriptionController()),
+          ChangeNotifierProvider(create: (_) => AuthService()),
         ],
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,

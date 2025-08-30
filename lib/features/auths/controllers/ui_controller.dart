@@ -7,7 +7,7 @@ class UIController extends ChangeNotifier {
   bool _obscureConfirmNewPassword = true;
   bool _isChecked = false;
   String? _selectedLang;
-  String? _selectedValue;
+  String? _selectedValue = 'English';
 
   // Text Controllers
   final TextEditingController nameController = TextEditingController();
@@ -65,6 +65,29 @@ class UIController extends ChangeNotifier {
 
   void setSelectedValue(String? value) {
     _selectedValue = value;
+    notifyListeners();
+  }
+
+  // Clear all form fields
+  void clearAllFormFields() {
+    nameController.clear();
+    emailController.clear();
+    passwordController.clear();
+    confirmPasswordController.clear();
+    newPasswordController.clear();
+    confirmNewPasswordController.clear();
+    
+    // Clear OTP controllers
+    for (var controller in otpControllers) {
+      controller.clear();
+    }
+    
+    // Reset password visibility states
+    _obscurePassword = true;
+    _obscureConfirmPassword = true;
+    _obscureNewPassword = true;
+    _obscureConfirmNewPassword = true;
+    
     notifyListeners();
   }
 

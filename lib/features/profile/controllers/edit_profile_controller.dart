@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:trip_mate/config/colors/colors.dart';
 import 'package:trip_mate/features/profile/models/edit_profile_model.dart';
 
 class EditProfileController extends ChangeNotifier {
@@ -8,6 +12,7 @@ class EditProfileController extends ChangeNotifier {
   final TextEditingController newPasswordController = TextEditingController();
   
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final ImagePicker _imagePicker = ImagePicker();
   
   bool _isLoading = false;
   bool _isSaving = false;
@@ -17,6 +22,10 @@ class EditProfileController extends ChangeNotifier {
   // Visibility toggles for password fields
   bool _isOldPasswordVisible = false;
   bool _isNewPasswordVisible = false;
+  
+  // Profile image
+  File? _selectedImage;
+  String _currentImageUrl = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face';
 
   // Getters
   bool get isLoading => _isLoading;
@@ -25,6 +34,8 @@ class EditProfileController extends ChangeNotifier {
   String? get successMessage => _successMessage;
   bool get isOldPasswordVisible => _isOldPasswordVisible;
   bool get isNewPasswordVisible => _isNewPasswordVisible;
+  File? get selectedImage => _selectedImage;
+  String get currentImageUrl => _currentImageUrl;
 
   EditProfileController() {
     _loadInitialData();
@@ -52,6 +63,33 @@ class EditProfileController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Pick image from gallery
+  Future<void> pickImageFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+        maxWidth: 512,
+        maxHeight: 512,
+      );
+      
+      if (image != null) {
+        _selectedImage = File(image.path);
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = 'Failed to pick image. Please try again.';
+      notifyListeners();
+    }
+  }
+
+
+
+  // Show image picker options
+  Future<void> showImagePickerOptions(BuildContext context) async {
+    await pickImageFromGallery();
   }
 
   // Toggle password visibility
@@ -129,6 +167,7 @@ class EditProfileController extends ChangeNotifier {
     emailController.clear();
     oldPasswordController.clear();
     newPasswordController.clear();
+    _selectedImage = null;
     _errorMessage = null;
     _successMessage = null;
     _isOldPasswordVisible = false;

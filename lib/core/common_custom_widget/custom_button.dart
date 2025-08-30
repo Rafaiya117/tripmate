@@ -14,6 +14,7 @@ class CustomButton extends StatelessWidget {
   final double fontSize;
   final String? iconPath;
   final Color? borderColor;
+  final bool isLoading;
 
   const CustomButton({
     super.key,
@@ -28,6 +29,7 @@ class CustomButton extends StatelessWidget {
     this.fontSize = 16,
     this.iconPath,
     this.borderColor,
+    this.isLoading = false,
   });
 
   @override
@@ -35,7 +37,7 @@ class CustomButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
@@ -46,22 +48,17 @@ class CustomButton extends StatelessWidget {
           ),
           minimumSize: Size(width.w, height.h),
         ),
-        child: iconPath == null
-            ? Text(
-                text,
-                style: GoogleFonts.inter(
-                  fontWeight: fontWeight,
-                  fontSize: fontSize.sp,
-                  letterSpacing: 0,
-                  color: textColor,
+        child: isLoading
+            ? SizedBox(
+                width: 20.w,
+                height: 20.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(textColor),
                 ),
               )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(iconPath!, height: 26.h, width: 26.w),
-                  SizedBox(width: 8.w),
-                  Text(
+            : iconPath == null
+                ? Text(
                     text,
                     style: GoogleFonts.inter(
                       fontWeight: fontWeight,
@@ -69,10 +66,24 @@ class CustomButton extends StatelessWidget {
                       letterSpacing: 0,
                       color: textColor,
                     ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(iconPath!, height: 26.h, width: 26.w),
+                      SizedBox(width: 8.w),
+                      Text(
+                        text,
+                        style: GoogleFonts.inter(
+                          fontWeight: fontWeight,
+                          fontSize: fontSize.sp,
+                          letterSpacing: 0,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          );
-        }
-      }
+      ),
+    );
+  }
+}

@@ -43,6 +43,7 @@ dependencies:
   go_router: ^16.2.0
   dropdown_button2: ^2.3.9
   provider: ^6.1.2
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:

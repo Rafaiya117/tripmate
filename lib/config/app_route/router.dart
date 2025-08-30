@@ -6,6 +6,7 @@ import 'package:trip_mate/features/auths/otp_verification.dart';
 import 'package:trip_mate/features/auths/reset_password.dart';
 import 'package:trip_mate/features/auths/reset_password_success.dart';
 import 'package:trip_mate/features/camera/camera.dart';
+import 'package:trip_mate/features/camera/image_view_screen.dart';
 import 'package:trip_mate/features/history/history.dart';
 import 'package:trip_mate/features/profile/profile.dart';
 import 'package:trip_mate/features/booster/booster.dart';
@@ -27,6 +28,10 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const LoginPage(),
     ),
     GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
       path: '/forgot_password',
       builder: (context, state) => const ForgotPasswordPage(),
     ),
@@ -45,6 +50,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/camera',
       builder: (context, state) => const CameraScreen(),
+    ),
+    GoRoute(
+      path: '/image_view',
+      builder: (context, state) {
+        final imagePath = state.uri.queryParameters['imagePath'] ?? '';
+        return ImageViewScreen(imagePath: imagePath);
+      },
     ),
     GoRoute(
       path: '/history',

@@ -10,14 +10,71 @@ import 'package:trip_mate/core/common_custom_widget/custom_input_field.dart';
 import 'package:trip_mate/core/common_custom_widget/custom_language_dropdown.dart';
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
 import 'package:trip_mate/features/auths/controllers/auth_controller.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool _emailError = false;
+  bool _passwordError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Clear any existing error states when the page is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _emailError = false;
+          _passwordError = false;
+        });
+      }
+    });
+  }
+
+  void _validateFields() {
+    setState(() {
+      _emailError = false;
+      _passwordError = false;
+    });
+  }
+
+  bool _validateForm() {
+    bool isValid = true;
+    
+    setState(() {
+      _emailError = false;
+      _passwordError = false;
+    });
+
+    // Check if email is empty
+    if (context.read<UIController>().emailController.text.trim().isEmpty) {
+      setState(() {
+        _emailError = true;
+      });
+      isValid = false;
+    }
+
+    // Check if password is empty
+    if (context.read<UIController>().passwordController.text.trim().isEmpty) {
+      setState(() {
+        _passwordError = true;
+      });
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer2<UIController, AuthController>(
-      builder: (context, uiController, authController, child) {
+    return Consumer3<UIController, AuthController, AuthService>(
+      builder: (context, uiController, authController, authService, child) {
         return Scaffold(
           backgroundColor: AppColors.backgroundColor2,
           appBar: AppBar(
@@ -25,12 +82,13 @@ class LoginPage extends StatelessWidget {
             toolbarHeight: 40.h,
             automaticallyImplyLeading: false,
             elevation: 0,
+            // Language Dropdown
             title: Align(
               alignment: Alignment.topRight,
               child: CustomDropdown(
-                items: ['Item1', 'Item2', 'Item3', 'Item4'],
+                items: ['English', '简体中文', '繁體中文'],
                 selectedValue: uiController.selectedValue,
-                hintText: 'Select Item',
+                hintText: 'Select Language',
                 onChanged: (value) {
                   uiController.setSelectedValue(value);
                 },
@@ -59,23 +117,76 @@ class LoginPage extends StatelessWidget {
                         color: AppColors.textColor1,
                       ),
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(height: 8.h),
                     CustomInputField(
-                      label: "Enter email address",
-                      hintText: "example@mail.com",
+                      label: "Email *",
+                      hintText: "Enter your email",
                       controller: uiController.emailController,
+                      isError: _emailError,
+                      onChanged: (value) {
+                        if (authController.errorMessage != null) {
+                          authController.setErrorMessage(null);
+                        }
+                        if (_emailError) {
+                          setState(() {
+                            _emailError = false;
+                          });
+                        }
+                      },
                     ),
                     SizedBox(height: 10.h),
                     CustomInputField(
-                      label: "Enter password",
-                      hintText: "********",
+                      label: "Password *",
+                      hintText: "Enter password",
                       controller: uiController.passwordController,
                       isPassword: true,
                       obscureText: uiController.obscurePassword,
+                      isError: _passwordError,
                       onToggleVisibility: () {
                         uiController.togglePasswordVisibility();
                       },
+                      onChanged: (value) {
+                        if (authController.errorMessage != null) {
+                          authController.setErrorMessage(null);
+                        }
+                        if (_passwordError) {
+                          setState(() {
+                            _passwordError = false;
+                          });
+                        }
+                      },
                     ),
+                    if (authController.errorMessage != null) ...[
+                      SizedBox(height: 10.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              color: Colors.red.shade600,
+                              size: 16.sp,
+                            ),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: Text(
+                                authController.errorMessage!,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14.sp,
+                                  color: Colors.red.shade600,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 20.h),
                     Padding(
                       padding: const EdgeInsets.only(left: 208),
@@ -85,7 +196,7 @@ class LoginPage extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w400,
                             fontSize: 16.sp,
-                            letterSpacing: 2,
+                            // letterSpacing: 2,
                             color: AppColors.primaryColors,
                           ),
                           recognizer: TapGestureRecognizer()
@@ -99,17 +210,38 @@ class LoginPage extends StatelessWidget {
                     CustomButton(
                       text: "Log in",
                       onPressed: () async {
-                        final success = await authController.login(
+                        // Validate form fields first
+                        if (!_validateForm()) {
+                          return;
+                        }
+                        
+                        final success = await authService.login(
                           uiController.emailController.text,
                           uiController.passwordController.text,
                         );
                         if (success) {
-                          // Navigate to camera screen after successful login
-                          context.go('/camera');
+                          // Clear the form fields after successful login
+                          uiController.emailController.clear();
+                          uiController.passwordController.clear();
+                          
+                          // Check if there's a pending image path
+                          if (authService.pendingImagePath != null) {
+                            // Navigate to image view screen with the pending image
+                            final imagePath = authService.pendingImagePath!;
+                            await authService.clearPendingImagePath(); // Clear the pending path
+                            context.go('/image_view?imagePath=${Uri.encodeComponent(imagePath)}');
+                          } else {
+                            // Navigate to camera screen if no pending image
+                            context.go('/camera');
+                          }
+                        } else {
+                          // Show error message
+                          authController.setErrorMessage('Invalid email or password');
                         }
                       },
                       backgroundColor: AppColors.primaryColors,
                       textColor: Colors.white,
+                      isLoading: authService.isLoading,
                     ),
                     SizedBox(height: 10.h),
                     Center(

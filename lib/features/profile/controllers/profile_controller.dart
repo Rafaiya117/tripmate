@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:trip_mate/features/profile/models/profile_model.dart';
 
 class ProfileController extends ChangeNotifier {
@@ -71,18 +74,30 @@ class ProfileController extends ChangeNotifier {
   }
 
   // Logout
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Simulate logout API call
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Get AuthService and logout
+      final authService = Provider.of<AuthService>(context, listen: false);
+      await authService.logout();
       
       // Clear profile data
       _profile = null;
+      _errorMessage = null;
       _isLoading = false;
       notifyListeners();
+      
+      // Clear all form fields in UIController
+      try {
+        final uiController = Provider.of<UIController>(context, listen: false);
+        uiController.clearAllFormFields();
+      } catch (e) {
+        // Handle case where UIController is not available
+        print('UIController not available during logout');
+      }
+      
     } catch (e) {
       _errorMessage = 'Failed to logout';
       _isLoading = false;

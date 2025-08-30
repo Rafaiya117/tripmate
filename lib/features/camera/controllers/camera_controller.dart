@@ -169,6 +169,13 @@ class TripMateCameraController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Reset camera state for new capture
+  void resetCameraState() {
+    _isCapturing = false;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _cameraController?.dispose();

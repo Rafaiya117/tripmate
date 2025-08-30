@@ -31,7 +31,7 @@ class EditProfileScreen extends StatelessWidget {
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Form(
             key: controller.formKey,
             child: Column(
@@ -39,10 +39,10 @@ class EditProfileScreen extends StatelessWidget {
                 // App Bar
                 _buildAppBar(context),
                 
-                SizedBox(height: 40.h),
+                SizedBox(height: 32.h),
                 
                 // Profile Image Section
-                _buildProfileImageSection(),
+                _buildProfileImageSection(context, controller),
                 
                 SizedBox(height: 40.h),
                 
@@ -54,7 +54,7 @@ class EditProfileScreen extends StatelessWidget {
                 // Save Button
                 _buildSaveButton(context, controller),
                 
-                SizedBox(height: 20.h),
+                SizedBox(height: 24.h),
               ],
             ),
           ),
@@ -65,104 +65,154 @@ class EditProfileScreen extends StatelessWidget {
 
   Widget _buildAppBar(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
+      padding: EdgeInsets.symmetric(vertical: 12.h),
       child: Row(
         children: [
           // Back Button
           GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Container(
-              width: 26.w,
-              height: 26.w,
+              width: 40.w,
+              height: 40.w,
               decoration: BoxDecoration(
-                color: AppColors.disabled1,
-                borderRadius: BorderRadius.circular(4.r),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: Icon(
-                Icons.arrow_back,
-                size: 18.sp,
+                Icons.arrow_back_ios_new,
+                size: 20.sp,
                 color: AppColors.iconColor,
               ),
             ),
           ),
           
-          SizedBox(width: 16.w),
+          SizedBox(width: 20.w),
           
           // Title
           Expanded(
             child: Text(
-              'Edit profile',
+              'Edit Profile',
               style: GoogleFonts.inter(
                 color: AppColors.textColor1,
-                fontSize: 22.sp,
+                fontSize: 24.sp,
                 fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
             ),
           ),
           
-          SizedBox(width: 42.w), // Balance the back button
+          SizedBox(width: 60.w), // Balance the back button
         ],
       ),
     );
   }
 
-  Widget _buildProfileImageSection() {
-    return Center(
-      child: Stack(
-        children: [
-          // Profile Image
-          Container(
-            width: 94.w,
-            height: 94.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.primaryColor,
-                width: 3.w,
-              ),
-            ),
-            child: ClipOval(
-              child: Image.network(
-                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: AppColors.disabled1,
-                    child: Icon(
-                      Icons.person,
-                      size: 40.sp,
-                      color: AppColors.iconColor,
+  Widget _buildProfileImageSection(BuildContext context, EditProfileController controller) {
+    return Column(
+      children: [
+        // Profile Image Container
+        Center(
+          child: Stack(
+            children: [
+              // Profile Image
+              Container(
+                width: 120.w,
+                height: 120.w,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primaryColor,
+                    width: 4.w,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
-                  );
-                },
-              ),
-            ),
-          ),
-          
-          // Camera Icon Overlay
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              width: 24.w,
-              height: 24.w,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4.r),
-                border: Border.all(
-                  color: AppColors.primaryColor,
-                  width: 1,
+                  ],
+                ),
+                child: ClipOval(
+                  child: controller.selectedImage != null
+                      ? Image.file(
+                          controller.selectedImage!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildDefaultProfileImage();
+                          },
+                        )
+                      : Image.network(
+                          controller.currentImageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildDefaultProfileImage();
+                          },
+                        ),
                 ),
               ),
-              child: Icon(
-                Icons.camera_alt,
-                size: 16.sp,
-                color: AppColors.iconColor,
+              
+              // Camera Icon Overlay
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () => controller.showImagePickerOptions(context),
+                  child: Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor,
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 20.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Profile Image Text
+        Text(
+          'Tap to change profile picture',
+          style: GoogleFonts.inter(
+            color: Colors.grey.shade600,
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDefaultProfileImage() {
+    return Container(
+      color: AppColors.disabled1,
+      child: Icon(
+        Icons.person,
+        size: 50.sp,
+        color: AppColors.iconColor,
       ),
     );
   }
@@ -172,8 +222,9 @@ class EditProfileScreen extends StatelessWidget {
       children: [
         // Full Name Field
         CustomTextField(
-          label: 'Full name',
+          label: 'Full Name',
           controller: controller.fullNameController,
+          isRequired: true,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Please enter your full name';
@@ -187,8 +238,9 @@ class EditProfileScreen extends StatelessWidget {
         
         // Email Field
         CustomTextField(
-          label: 'Email address',
+          label: 'Email Address',
           controller: controller.emailController,
+          isRequired: true,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Please enter your email address';
@@ -205,14 +257,14 @@ class EditProfileScreen extends StatelessWidget {
         
         // Old Password Field
         CustomTextField(
-          label: 'Old password',
+          label: 'Current Password',
           controller: controller.oldPasswordController,
           isPassword: true,
           isVisible: controller.isOldPasswordVisible,
           onToggleVisibility: controller.toggleOldPasswordVisibility,
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
-              return 'Please enter your old password';
+              return 'Please enter your current password';
             }
             return null;
           },
@@ -222,7 +274,7 @@ class EditProfileScreen extends StatelessWidget {
         
         // New Password Field
         CustomTextField(
-          label: 'New password',
+          label: 'New Password',
           controller: controller.newPasswordController,
           isPassword: true,
           isVisible: controller.isNewPasswordVisible,
@@ -244,34 +296,59 @@ class EditProfileScreen extends StatelessWidget {
   Widget _buildSaveButton(BuildContext context, EditProfileController controller) {
     return Container(
       width: double.infinity,
-      height: 52.h,
+      height: 56.h,
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
-        borderRadius: BorderRadius.circular(8.r),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryColor,
+            AppColors.primaryColor.withOpacity(0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(8.r),
+          borderRadius: BorderRadius.circular(16.r),
           onTap: controller.isSaving ? null : () => _handleSave(context, controller),
           child: Center(
             child: controller.isSaving
                 ? SizedBox(
-                    width: 20.w,
-                    height: 20.w,
+                    width: 24.w,
+                    height: 24.w,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2.w,
+                      strokeWidth: 2.5.w,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : Text(
-                    'Save',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                      height: 1.20,
-                    ),
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.save,
+                        color: Colors.white,
+                        size: 20.sp,
+                      ),
+                      SizedBox(width: 8.w),
+                      Text(
+                        'Save Changes',
+                        style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                          height: 1.20,
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ),
@@ -286,9 +363,27 @@ class EditProfileScreen extends StatelessWidget {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(controller.successMessage!),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 2),
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white, size: 20.sp),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  controller.successMessage!,
+                  style: GoogleFonts.inter(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.green.shade600,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
         ),
       );
       
@@ -300,9 +395,27 @@ class EditProfileScreen extends StatelessWidget {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(controller.errorMessage!),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
+          content: Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 20.sp),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  controller.errorMessage!,
+                  style: GoogleFonts.inter(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red.shade600,
+          duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
         ),
       );
     }

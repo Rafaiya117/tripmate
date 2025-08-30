@@ -60,6 +60,10 @@ class CustomDropdown extends StatelessWidget {
     padding: padding,
     height: buttonHeight,
     width: buttonWidth,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(100),
+    ),
   ),
   menuItemStyleData: MenuItemStyleData(
     height: itemHeight,
@@ -69,9 +73,22 @@ class CustomDropdown extends StatelessWidget {
   ),
   dropdownStyleData: DropdownStyleData(
     decoration: BoxDecoration(
-      color: Colors.white,              // background color of dropdown
-      borderRadius: BorderRadius.circular(12), // rounded corners
-      border: Border.all(color: Colors.grey.shade300), // optional border
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade200),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    offset: const Offset(0, 8),
+    scrollbarTheme: ScrollbarThemeData(
+      radius: const Radius.circular(40),
+      thickness: MaterialStateProperty.all(6),
+      thumbVisibility: MaterialStateProperty.all(true),
     ),
   ),
 ),

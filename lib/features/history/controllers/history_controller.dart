@@ -143,4 +143,36 @@ class HistoryController extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
   }
+
+  // Time filter functionality
+  void filterByTime(String timeFilter) {
+    final now = DateTime.now();
+    DateTime filterDate;
+
+    switch (timeFilter) {
+      case 'week':
+        filterDate = now.subtract(const Duration(days: 7));
+        break;
+      case 'month':
+        filterDate = DateTime(now.year, now.month - 1, now.day);
+        break;
+      case 'year':
+        filterDate = DateTime(now.year - 1, now.month, now.day);
+        break;
+      default:
+        filterDate = DateTime(1900); // Show all items
+    }
+
+    _filteredList = _historyList.where((history) {
+      return history.createdAt.isAfter(filterDate);
+    }).toList();
+
+    notifyListeners();
+  }
+
+  // Clear time filter
+  void clearTimeFilter() {
+    _filteredList = List.from(_historyList);
+    notifyListeners();
+  }
 }

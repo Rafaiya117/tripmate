@@ -9,14 +9,15 @@ import 'package:trip_mate/core/common_custom_widget/custom_button.dart';
 import 'package:trip_mate/core/common_custom_widget/custom_input_field.dart';
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
 import 'package:trip_mate/features/auths/controllers/auth_controller.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<UIController, AuthController>(
-      builder: (context, uiController, authController, child) {
+    return Consumer3<UIController, AuthController, AuthService>(
+      builder: (context, uiController, authController, authService, child) {
         return Scaffold(
           backgroundColor: AppColors.backgroundColor2,
           body: SafeArea(
@@ -130,19 +131,30 @@ class SignUp extends StatelessWidget {
                     CustomButton(
                       text: "Sign up",
                       onPressed: () async {
-                        final success = await authController.signUp(
+                        final success = await authService.signUp(
                           uiController.nameController.text,
                           uiController.emailController.text,
                           uiController.passwordController.text,
-                          uiController.confirmPasswordController.text,
                         );
                         if (success) {
-                          // Navigate to next screen
-                          print('Sign up successful');
+                          // Check if there's a pending image path
+                          if (authService.pendingImagePath != null) {
+                            // Navigate to image view screen with the pending image
+                            final imagePath = authService.pendingImagePath!;
+                            await authService.clearPendingImagePath(); // Clear the pending path
+                            context.go('/image_view?imagePath=${Uri.encodeComponent(imagePath)}');
+                          } else {
+                            // Navigate to camera screen if no pending image
+                            context.go('/camera');
+                          }
+                        } else {
+                          // Show error message
+                          authController.setErrorMessage('Sign up failed. Please try again.');
                         }
                       },
                       backgroundColor: AppColors.primaryColors,
                       textColor: Colors.white,
+                      isLoading: authService.isLoading,
                     ),
                     SizedBox(height: 10.h),
                     Center(

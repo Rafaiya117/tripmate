@@ -9,7 +9,9 @@ class CustomInputField extends StatelessWidget {
   final TextEditingController controller;
   final bool isPassword;
   final bool obscureText; 
-  final VoidCallback? onToggleVisibility; 
+  final VoidCallback? onToggleVisibility;
+  final ValueChanged<String>? onChanged;
+  final bool isError;
 
   const CustomInputField({
     super.key,
@@ -19,6 +21,8 @@ class CustomInputField extends StatelessWidget {
     this.isPassword = false,
     this.obscureText = false,
     this.onToggleVisibility,
+    this.onChanged,
+    this.isError = false,
   });
 
   @override
@@ -32,7 +36,7 @@ class CustomInputField extends StatelessWidget {
             fontWeight: FontWeight.w400,
             fontSize: 18.sp,
             letterSpacing: 0,
-            color: AppColors.labelTextColor,
+            color: isError ? Colors.red.shade600 : AppColors.labelTextColor,
           ),
         ),
         SizedBox(height: 8.h),
@@ -42,6 +46,7 @@ class CustomInputField extends StatelessWidget {
           child: TextFormField(
             controller: controller,
             obscureText: isPassword ? obscureText : false,
+            onChanged: onChanged,
             decoration: InputDecoration(
               fillColor: Colors.white,
               filled: true,
@@ -55,15 +60,24 @@ class CustomInputField extends StatelessWidget {
               contentPadding: const EdgeInsets.all(10.0),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4.0),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: isError ? Colors.red.shade400 : Colors.transparent,
+                  width: isError ? 1.5 : 0,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4.0),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: isError ? Colors.red.shade400 : Colors.transparent,
+                  width: isError ? 1.5 : 0,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4.0),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(
+                  color: isError ? Colors.red.shade400 : Colors.transparent,
+                  width: isError ? 1.5 : 0,
+                ),
               ),
               suffixIcon: isPassword
                   ? IconButton(

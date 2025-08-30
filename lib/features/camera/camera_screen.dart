@@ -1,4 +1,4 @@
-import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +9,7 @@ import 'package:trip_mate/config/colors/colors.dart';
 import 'package:trip_mate/features/camera/controllers/camera_controller.dart';
 import 'package:trip_mate/features/camera/controllers/ui_controller.dart';
 import 'package:trip_mate/core/common_custom_widget/custom_language_dropdown.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:camera/camera.dart' as camera_package;
 
 class CameraScreen extends StatefulWidget {
@@ -18,13 +19,12 @@ class CameraScreen extends StatefulWidget {
   State<CameraScreen> createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> {
-  Timer? _analyzingTimer;
-  int _analyzingTime = 25;
+class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver {
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Initialize camera when screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TripMateCameraController>().initializeCamera();
@@ -33,32 +33,42 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    _analyzingTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  void _startAnalyzingTimer() {
-    _analyzingTime = 25;
-    _analyzingTimer?.cancel();
-    _analyzingTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Reset camera state when app becomes active
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<TripMateCameraController>().resetCameraState();
+        }
+      });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reset camera state when returning to this screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        setState(() {
-          if (_analyzingTime > 0) {
-            _analyzingTime--;
-          } else {
-            timer.cancel();
-            // Reset analyzing state when timer completes
-            context.read<TripMateCameraController>().stopAnalyzing();
-          }
-        });
+        context.read<TripMateCameraController>().resetCameraState();
       }
     });
   }
 
+
+
+
+
   @override
   Widget build(BuildContext context) {
-    return Consumer2<CameraUIController, TripMateCameraController>(
-      builder: (context, uiController, cameraController, child) {
+    return Consumer3<CameraUIController, TripMateCameraController, AuthService>(
+      builder: (context, uiController, cameraController, authService, child) {
         return Scaffold(
           backgroundColor: Colors.black,
           body: Stack(
@@ -143,36 +153,25 @@ class _CameraScreenState extends State<CameraScreen> {
                             ),
                             
                             // Language Dropdown
-                            GestureDetector(
-                              onTap: () => _showLanguageDropdown(context, uiController),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                decoration: ShapeDecoration(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100.r),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      uiController.selectedLanguage,
-                                      style: GoogleFonts.inter(
-                                        color: AppColors.iconColor,
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.20,
-                                      ),
-                                    ),
-                                    SizedBox(width: 4.w),
-                                    Icon(
-                                      Icons.keyboard_arrow_down,
-                                      size: 16.sp,
-                                      color: AppColors.iconColor,
-                                    ),
-                                  ],
-                                ),
+                            CustomDropdown(
+                              items: ['English', '简体中文', '繁體中文'],
+                              selectedValue: uiController.selectedLanguage,
+                              hintText: 'Select Language',
+                              onChanged: (value) {
+                                if (value != null) {
+                                  uiController.setLanguage(value);
+                                }
+                              },
+                              buttonWidth: 120,
+                              buttonHeight: 32,
+                              itemHeight: 40,
+                              fontSize: 12,
+                              textColor: AppColors.iconColor,
+                              padding: EdgeInsets.symmetric(horizontal: 10.w),
+                              icon: Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 16.sp,
+                                color: AppColors.iconColor,
                               ),
                             ),
                           ],
@@ -187,17 +186,11 @@ class _CameraScreenState extends State<CameraScreen> {
                        right: 0,
                        child: Padding(
                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                         child: _buildCameraControls(context, cameraController),
+                         child: _buildCameraControls(context, cameraController, authService),
                        ),
                      ),
                      
-                     // Processing UI - Center of Screen
-                     if (cameraController.isCapturing)
-                       Positioned.fill(
-                         child: Center(
-                           child: _buildProcessingUI(context, cameraController),
-                         ),
-                       ),
+                     
                   ],
                 ),
               ),
@@ -208,92 +201,9 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  Widget _buildProcessingUI(BuildContext context, TripMateCameraController cameraController) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Analyzing Button
-        Container(
-          width: 200.w,
-          height: 48.h,
-          decoration: ShapeDecoration(
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24.r),
-              side: BorderSide(
-                color: const Color(0xFF6B7280),
-                width: 1,
-              ),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 20.w,
-                height: 20.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.w,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    const Color(0xFF6B7280),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-                             Text(
-                 'Analyzing ${_analyzingTime}s',
-                 style: GoogleFonts.inter(
-                   color: const Color(0xFF6B7280),
-                   fontSize: 16.sp,
-                   fontWeight: FontWeight.w500,
-                 ),
-               ),
-            ],
-          ),
-        ),
-        
-        SizedBox(height: 16.h),
-        
-                 // Boost Button
-         GestureDetector(
-           onTap: () {
-             context.push('/booster');
-           },
-           child: Container(
-             width: 200.w,
-             height: 48.h,
-             decoration: ShapeDecoration(
-               color: AppColors.primaryColor,
-               shape: RoundedRectangleBorder(
-                 borderRadius: BorderRadius.circular(24.r),
-               ),
-             ),
-             child: Row(
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Text(
-                   'Boost',
-                   style: GoogleFonts.inter(
-                     color: Colors.white,
-                     fontSize: 16.sp,
-                     fontWeight: FontWeight.w500,
-                   ),
-                 ),
-                 SizedBox(width: 8.w),
-                 Icon(
-                   Icons.flash_on,
-                   size: 20.sp,
-                   color: Colors.white,
-                 ),
-               ],
-             ),
-           ),
-         ),
-      ],
-    );
-  }
+  
 
-  Widget _buildCameraControls(BuildContext context, TripMateCameraController cameraController) {
+  Widget _buildCameraControls(BuildContext context, TripMateCameraController cameraController, AuthService authService) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -339,13 +249,33 @@ class _CameraScreenState extends State<CameraScreen> {
               Positioned(
                 left: 4.w,
                 top: 4.w,
-                child: GestureDetector(
-                                     onTap: cameraController.isCapturing 
+                                 child: GestureDetector(
+                   onTap: cameraController.isCapturing 
                      ? null 
-                     : () async {
-                         await cameraController.capturePhoto();
-                         _startAnalyzingTimer();
-                       },
+                                             : () async {
+                          // Check if user is authenticated
+                          if (!authService.isAuthenticated()) {
+                            // Capture photo first
+                            await cameraController.capturePhoto();
+                            if (cameraController.lastCapturedImage != null) {
+                              // Store the captured image path for after login
+                              await authService.setPendingImagePath(cameraController.lastCapturedImage!);
+                              // Reset camera state
+                              cameraController.resetCameraState();
+                              // Show login screen
+                              context.push('/login_page');
+                            }
+                            return;
+                          }
+                          
+                          await cameraController.capturePhoto();
+                          if (cameraController.lastCapturedImage != null) {
+                            // Navigate to image view screen with the captured image
+                            context.push('/image_view?imagePath=${Uri.encodeComponent(cameraController.lastCapturedImage!)}');
+                            // Reset camera state after navigation
+                            cameraController.resetCameraState();
+                          }
+                        },
                   child: Container(
                     width: 56.w,
                     height: 56.w,
@@ -400,93 +330,5 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  void _showLanguageDropdown(BuildContext context, CameraUIController uiController) {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
-    final Offset buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
-    
-    final RelativeRect position = RelativeRect.fromLTRB(
-      buttonPosition.dx,
-      0,
-      overlay.size.width - buttonPosition.dx - button.size.width,
-      buttonPosition.dy,
-    );
 
-    showMenu(
-      context: context,
-      position: position,
-      items: [
-        PopupMenuItem<String>(
-          value: 'English',
-          child: Row(
-            children: [
-              Text(
-                'English',
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (uiController.selectedLanguage == 'English')
-                const Spacer(),
-              if (uiController.selectedLanguage == 'English')
-                Icon(
-                  Icons.check,
-                  size: 16.sp,
-                  color: AppColors.primaryColor,
-                ),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: '简体中文',
-          child: Row(
-            children: [
-              Text(
-                '简体中文',
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (uiController.selectedLanguage == '简体中文')
-                const Spacer(),
-              if (uiController.selectedLanguage == '简体中文')
-                Icon(
-                  Icons.check,
-                  size: 16.sp,
-                  color: AppColors.primaryColor,
-                ),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: '繁體中文',
-          child: Row(
-            children: [
-              Text(
-                '繁體中文',
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (uiController.selectedLanguage == '繁體中文')
-                const Spacer(),
-              if (uiController.selectedLanguage == '繁體中文')
-                Icon(
-                  Icons.check,
-                  size: 16.sp,
-                  color: AppColors.primaryColor,
-                ),
-            ],
-          ),
-        ),
-      ],
-    ).then((value) {
-      if (value != null) {
-        uiController.setLanguage(value);
-      }
-    });
-  }
 }

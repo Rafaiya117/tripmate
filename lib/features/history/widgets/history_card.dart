@@ -94,7 +94,6 @@ class HistoryCard extends StatelessWidget {
                   ),
                 ),
               ),
-
               // Location Badge (if available)
               if (history.location != null)
                 Positioned(

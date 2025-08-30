@@ -154,19 +154,109 @@ class _HistoryScreenState extends State<HistoryScreen> {
           
           SizedBox(width: 8.w),
           
-          // Filter Icon
-          Container(
-            width: 20.w,
-            height: 18.w,
-            decoration: BoxDecoration(
-              color: AppColors.disabled2,
-              borderRadius: BorderRadius.circular(4.r),
+          // Filter Icon with Dropdown
+          PopupMenuButton<String>(
+            icon: Container(
+              width: 20.w,
+              height: 18.w,
+              decoration: BoxDecoration(
+                color: AppColors.disabled2,
+                borderRadius: BorderRadius.circular(4.r),
+              ),
+              child: Icon(
+                Icons.filter_list,
+                size: 14.sp,
+                color: AppColors.iconColor,
+              ),
             ),
-            child: Icon(
-              Icons.filter_list,
-              size: 14.sp,
-              color: AppColors.iconColor,
+            onSelected: (value) => _applyFilter(controller, value),
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'week',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 18.sp,
+                      color: AppColors.iconColor,
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Last week',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        color: AppColors.textColor1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'month',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_month,
+                      size: 18.sp,
+                      color: AppColors.iconColor,
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Last month',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        color: AppColors.textColor1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'year',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_view_month,
+                      size: 18.sp,
+                      color: AppColors.iconColor,
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Last year',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        color: AppColors.textColor1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'clear',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.clear,
+                      size: 18.sp,
+                      color: Colors.red,
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      'Clear filter',
+                      style: GoogleFonts.inter(
+                        fontSize: 14.sp,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
             ),
+            elevation: 8,
+            offset: Offset(0, 8.h),
           ),
         ],
       ),
@@ -304,5 +394,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void _onHistoryTap(BuildContext context, history) {
     // Navigate to history details screen
     context.push('/history/${history.id}');
+  }
+
+  void _applyFilter(HistoryController controller, String filterType) {
+    switch (filterType) {
+      case 'week':
+        controller.filterByTime('week');
+        break;
+      case 'month':
+        controller.filterByTime('month');
+        break;
+      case 'year':
+        controller.filterByTime('year');
+        break;
+      case 'clear':
+        controller.clearTimeFilter();
+        break;
+    }
   }
 }
