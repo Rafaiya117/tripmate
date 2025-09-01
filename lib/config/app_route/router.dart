@@ -70,6 +70,16 @@ final GoRouter appRouter = GoRouter(
       },
     ),
     GoRoute(
+      path: '/history_details',
+      builder: (context, state) {
+        final imagePath = state.uri.queryParameters['imagePath'] ?? '';
+        return HistoryDetailsScreen(
+          historyId: 'captured',
+          capturedImagePath: imagePath,
+        );
+      },
+    ),
+    GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
     ),

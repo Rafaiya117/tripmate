@@ -73,125 +73,118 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           backgroundColor: Colors.black,
           body: Stack(
             children: [
-              // Camera Preview Area - Full Screen
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: Stack(
-                  children: [
-                    // Camera preview
-                    if (cameraController.isInitialized && cameraController.cameraController != null)
-                      camera_package.CameraPreview(cameraController.cameraController!)
-                    else
-                      // Camera preview placeholder
-                      Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        color: Colors.black,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.camera_alt,
-                                size: 80.sp,
-                                color: Colors.white.withOpacity(0.5),
-                              ),
-                              SizedBox(height: 16.h),
-                              if (cameraController.errorMessage != null)
-                                Text(
-                                  cameraController.errorMessage!,
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white,
-                                    fontSize: 14.sp,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                )
-                              else
-                                Text(
-                                  'Initializing camera...',
-                                  style: GoogleFonts.inter(
-                                    color: Colors.white.withOpacity(0.7),
-                                    fontSize: 14.sp,
-                                  ),
-                                ),
-                            ],
+              // Full Screen Camera Preview
+              if (cameraController.isInitialized && cameraController.cameraController != null)
+                SizedBox(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: camera_package.CameraPreview(cameraController.cameraController!),
+                )
+              else
+                // Camera preview placeholder
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.black,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.camera_alt,
+                          size: 80.sp,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
+                        SizedBox(height: 16.h),
+                        if (cameraController.errorMessage != null)
+                          Text(
+                            cameraController.errorMessage!,
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 14.sp,
+                            ),
+                            textAlign: TextAlign.center,
+                          )
+                        else
+                          Text(
+                            'Initializing camera...',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 14.sp,
+                            ),
                           ),
-                        ),
-                      ),
-                    
-                    // Top Controls
-                    Positioned(
-                      top: 50.h,
-                      left: 0,
-                      right: 0,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // Settings Button
-                            Container(
-                              width: 24.w,
-                              height: 24.w,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.settings,
-                                  size: 16.sp,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  // Navigate to profile screen
-                                  context.push('/profile');
-                                },
-                                padding: EdgeInsets.zero,
-                              ),
-                            ),
-                            
-                            // Language Dropdown
-                            CustomDropdown(
-                              items: ['English', '简体中文', '繁體中文'],
-                              selectedValue: uiController.selectedLanguage,
-                              hintText: 'Select Language',
-                              onChanged: (value) {
-                                if (value != null) {
-                                  uiController.setLanguage(value);
-                                }
-                              },
-                              buttonWidth: 120,
-                              buttonHeight: 32,
-                              itemHeight: 40,
-                              fontSize: 12,
-                              textColor: AppColors.iconColor,
-                              padding: EdgeInsets.symmetric(horizontal: 10.w),
-                              icon: Icon(
-                                Icons.keyboard_arrow_down,
-                                size: 16.sp,
-                                color: AppColors.iconColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ),
-                    
-                                         // Bottom Controls
-                     Positioned(
-                       bottom: 50.h,
-                       left: 0,
-                       right: 0,
-                       child: Padding(
-                         padding: EdgeInsets.symmetric(horizontal: 12.w),
-                         child: _buildCameraControls(context, cameraController, authService),
-                       ),
-                     ),
-                     
-                     
-                  ],
+                  ),
+                ),
+              
+              // Top Controls Overlay
+              Positioned(
+                top: 50.h,
+                left: 0,
+                right: 0,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Settings Button
+                      Container(
+                        width: 24.w,
+                        height: 24.w,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.settings,
+                            size: 16.sp,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            // Navigate to profile screen
+                            context.push('/profile');
+                          },
+                          padding: EdgeInsets.zero,
+                        ),
+                      ),
+                      
+                      // Language Dropdown
+                      CustomDropdown(
+                        items: ['English', '简体中文', '繁體中文'],
+                        selectedValue: uiController.selectedLanguage,
+                        hintText: 'Select Language',
+                        onChanged: (value) {
+                          if (value != null) {
+                            uiController.setLanguage(value);
+                          }
+                        },
+                        buttonWidth: 120,
+                        buttonHeight: 32,
+                        itemHeight: 40,
+                        fontSize: 12,
+                        textColor: AppColors.iconColor,
+                        padding: EdgeInsets.symmetric(horizontal: 10.w),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 16.sp,
+                          color: AppColors.iconColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Bottom Controls Overlay
+              Positioned(
+                bottom: 50.h,
+                left: 0,
+                right: 0,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  child: _buildCameraControls(context, cameraController, authService),
                 ),
               ),
             ],

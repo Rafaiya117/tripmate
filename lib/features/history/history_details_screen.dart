@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,10 +9,12 @@ import 'package:trip_mate/features/history/widgets/rich_text_widget.dart';
 
 class HistoryDetailsScreen extends StatelessWidget {
   final String historyId;
+  final String? capturedImagePath;
 
   const HistoryDetailsScreen({
     super.key,
     required this.historyId,
+    this.capturedImagePath,
   });
 
   @override
@@ -34,6 +37,68 @@ class HistoryDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, HistoryDetailsController controller) {
+    // If we have a captured image, show it directly without loading history details
+    if (capturedImagePath != null) {
+      return CustomScrollView(
+        slivers: [
+          // App Bar with Captured Image
+          SliverAppBar(
+            expandedHeight: 300.h,
+            floating: false,
+            pinned: true,
+            backgroundColor: AppColors.backgroundColor2,
+            leading: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Container(
+                margin: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.arrow_back,
+                  color: AppColors.iconColor,
+                  size: 20.sp,
+                ),
+              ),
+            ),
+            // No delete action for captured images
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: FileImage(File(capturedImagePath!)),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.3),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Content for captured image
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(16.w),
+              child: _buildCapturedImageContent(),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // For history items, load details from controller
     if (controller.isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -143,127 +208,11 @@ class HistoryDetailsScreen extends StatelessWidget {
           ),
         ),
 
-        // Content
+        // Content for history items
         SliverToBoxAdapter(
           child: Padding(
             padding: EdgeInsets.all(16.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  details.title,
-                  style: GoogleFonts.inter(
-                    color: AppColors.textColor1,
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                
-                SizedBox(height: 16.h),
-                
-                // Metadata Row
-                Row(
-                  children: [
-                    // Location
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 16.sp,
-                          color: AppColors.iconColor,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          details.location,
-                          style: GoogleFonts.inter(
-                            color: AppColors.textColor1,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    SizedBox(width: 24.w),
-                    
-                    // Year
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.business,
-                          size: 16.sp,
-                          color: AppColors.iconColor,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          details.year,
-                          style: GoogleFonts.inter(
-                            color: AppColors.textColor1,
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                
-                SizedBox(height: 24.h),
-                
-                // Description
-                RichTextWidget(
-                  text: details.description,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                ),
-                
-                SizedBox(height: 24.h),
-                
-                // Location Section
-                _buildSection(
-                  'Location',
-                  details.location,
-                  Icons.location_on,
-                ),
-                
-                SizedBox(height: 16.h),
-                
-                // Construction Section
-                _buildSection(
-                  'Construction',
-                  details.construction,
-                  Icons.construction,
-                ),
-                
-                SizedBox(height: 16.h),
-                
-                // Unfinished Structure Section
-                _buildSection(
-                  'Unfinished Structure',
-                  details.unfinishedStructure,
-                  Icons.architecture,
-                ),
-                
-                SizedBox(height: 24.h),
-                
-                // Visiting Hours Section
-                _buildVisitingHoursSection(details.visitingHours),
-                
-                SizedBox(height: 24.h),
-                
-                // Additional Info Section
-                if (details.additionalInfo.isNotEmpty) ...[
-                  RichTextWidget(
-                    text: details.additionalInfo,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  
-                  SizedBox(height: 24.h),
-                ],
-              ],
-            ),
+            child: _buildHistoryContent(details),
           ),
         ),
       ],
@@ -381,6 +330,236 @@ class HistoryDetailsScreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildCapturedImageContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title
+        Text(
+          'Red Fort - Historical Monument',
+          style: GoogleFonts.inter(
+            color: AppColors.textColor1,
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Metadata Row
+        Row(
+          children: [
+            // Location
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 16.sp,
+                  color: AppColors.iconColor,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  'Delhi, India',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textColor1,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+            
+            SizedBox(width: 24.w),
+            
+            // Year
+            Row(
+              children: [
+                Icon(
+                  Icons.business,
+                  size: 16.sp,
+                  color: AppColors.iconColor,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  '1648',
+                  style: GoogleFonts.inter(
+                    color: AppColors.textColor1,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        
+        SizedBox(height: 24.h),
+        
+        // Description
+        Text(
+          'The Red Fort is a historic fort in the city of Delhi in India. It was the main residence of the emperors of the Mughal dynasty for nearly 200 years, until 1857. The fort represents the peak in Mughal architecture under Shah Jahan.',
+          style: GoogleFonts.inter(
+            color: AppColors.textColor1,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w400,
+            height: 1.5,
+          ),
+        ),
+        
+        SizedBox(height: 24.h),
+        
+        // Location Section
+        _buildSection(
+          'Location',
+          'Located in Old Delhi, the fort was built by the Mughal emperor Shah Jahan as the palace fort of his capital Shahjahanabad.',
+          Icons.location_on,
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Construction Section
+        _buildSection(
+          'Construction',
+          'Construction began in 1638 and was completed in 1648. The fort was designed by architect Ustad Ahmad Lahori, who also designed the Taj Mahal.',
+          Icons.construction,
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Architecture Section
+        _buildSection(
+          'Architecture',
+          'The Red Fort showcases the peak of Mughal architecture with its red sandstone walls, white marble inlays, and intricate carvings.',
+          Icons.architecture,
+        ),
+        
+        SizedBox(height: 24.h),
+        
+
+      ],
+    );
+  }
+
+  Widget _buildHistoryContent(dynamic details) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title
+        Text(
+          details.title,
+          style: GoogleFonts.inter(
+            color: AppColors.textColor1,
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Metadata Row
+        Row(
+          children: [
+            // Location
+            Row(
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 16.sp,
+                  color: AppColors.iconColor,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  details.location,
+                  style: GoogleFonts.inter(
+                    color: AppColors.textColor1,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+            
+            SizedBox(width: 24.w),
+            
+            // Year
+            Row(
+              children: [
+                Icon(
+                  Icons.business,
+                  size: 16.sp,
+                  color: AppColors.iconColor,
+                ),
+                SizedBox(width: 4.w),
+                Text(
+                  details.year,
+                  style: GoogleFonts.inter(
+                    color: AppColors.textColor1,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        
+        SizedBox(height: 24.h),
+        
+        // Description
+        RichTextWidget(
+          text: details.description,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+        
+        SizedBox(height: 24.h),
+        
+        // Location Section
+        _buildSection(
+          'Location',
+          details.location,
+          Icons.location_on,
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Construction Section
+        _buildSection(
+          'Construction',
+          details.construction,
+          Icons.construction,
+        ),
+        
+        SizedBox(height: 16.h),
+        
+        // Unfinished Structure Section
+        _buildSection(
+          'Unfinished Structure',
+          details.unfinishedStructure,
+          Icons.architecture,
+        ),
+        
+        SizedBox(height: 24.h),
+        
+        // Visiting Hours Section
+        _buildVisitingHoursSection(details.visitingHours),
+        
+        SizedBox(height: 24.h),
+        
+        // Additional Info Section
+        if (details.additionalInfo.isNotEmpty) ...[
+          RichTextWidget(
+            text: details.additionalInfo,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+          
+          SizedBox(height: 24.h),
+        ],
+      ],
     );
   }
 }

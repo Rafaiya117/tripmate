@@ -51,10 +51,17 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
           } else {
             timer.cancel();
             _isAnalyzing = false;
+            // Navigate to history details screen after analysis completes
+            _navigateToHistoryDetails();
           }
         });
       }
     });
+  }
+
+  void _navigateToHistoryDetails() {
+    // Navigate to history details screen with the captured image
+    context.push('/history_details?imagePath=${Uri.encodeComponent(widget.imagePath)}');
   }
 
   @override
@@ -131,27 +138,27 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                   ),
                   
                                      // Title
-                   Container(
-                     padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                     decoration: BoxDecoration(
-                       color: Colors.black.withOpacity(0.5),
-                       borderRadius: BorderRadius.circular(20.r),
-                     ),
-                     child: Text(
-                       'Captured Image',
-                       style: GoogleFonts.inter(
-                         color: Colors.white,
-                         fontSize: 14.sp,
-                         fontWeight: FontWeight.w500,
-                       ),
-                     ),
-                   ),
+                  //  Container(
+                  //    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                  //    decoration: BoxDecoration(
+                  //      color: Colors.black.withOpacity(0.5),
+                  //      borderRadius: BorderRadius.circular(20.r),
+                  //    ),
+                  //    child: Text(
+                  //      'Captured Image',
+                  //      style: GoogleFonts.inter(
+                  //        color: Colors.white,
+                  //        fontSize: 14.sp,
+                  //        fontWeight: FontWeight.w500,
+                  //      ),
+                  //    ),
+                  //  ),
                  ],
               ),
             ),
           ),
           
-          // Center processing UI overlay
+          // Center processing UI overlay - only show during analysis
           if (_isAnalyzing)
             Positioned.fill(
               child: Container(
@@ -261,6 +268,8 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
       ],
     );
   }
+
+
 
   Widget _buildBottomActionBar() {
     return Row(
