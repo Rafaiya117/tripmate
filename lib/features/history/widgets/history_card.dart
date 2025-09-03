@@ -98,7 +98,8 @@ class HistoryCard extends StatelessWidget {
               if (history.location != null)
                 Positioned(
                   top: 12.h,
-                  left: 120.w,
+                  // left: 120.w,
+                  left: 130.w,
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                     decoration: BoxDecoration(

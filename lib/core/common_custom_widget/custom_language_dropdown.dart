@@ -6,7 +6,7 @@ class CustomDropdown extends StatelessWidget {
   final String? selectedValue;
   final String hintText;
   final ValueChanged<String?> onChanged;
-
+  
   // Customization parameters
   final double buttonWidth;
   final double buttonHeight;
@@ -15,7 +15,7 @@ class CustomDropdown extends StatelessWidget {
   final Color textColor;
   final EdgeInsetsGeometry padding;
   final Widget? icon;
-
+  final Color buttonColor;
   const CustomDropdown({
     super.key,
     required this.items,
@@ -29,6 +29,7 @@ class CustomDropdown extends StatelessWidget {
     this.textColor = Colors.black,
     this.padding = const EdgeInsets.symmetric(horizontal: 16),
     this.icon,
+    this.buttonColor = Colors.white,
   });
 
   @override
@@ -61,7 +62,7 @@ class CustomDropdown extends StatelessWidget {
     height: buttonHeight,
     width: buttonWidth,
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: buttonColor,
       borderRadius: BorderRadius.circular(100),
     ),
   ),
@@ -73,7 +74,7 @@ class CustomDropdown extends StatelessWidget {
   ),
   dropdownStyleData: DropdownStyleData(
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: buttonColor,
       borderRadius: BorderRadius.circular(12),
       border: Border.all(color: Colors.grey.shade200),
       boxShadow: [

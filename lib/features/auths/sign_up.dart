@@ -200,7 +200,7 @@ class SignUp extends StatelessWidget {
                     CustomButton(
                       text: "Google",
                       onPressed: () {},
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppColors.backgroundColor2,
                       textColor: Colors.black,
                       iconPath: AppAssets.googleIcon,
                       borderColor: Colors.black,

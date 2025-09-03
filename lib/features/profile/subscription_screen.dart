@@ -91,7 +91,8 @@ class SubscriptionScreen extends StatelessWidget {
               width: 26.w,
               height: 26.w,
               decoration: BoxDecoration(
-                color: AppColors.disabled1,
+                // color: AppColors.disabled1,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Icon(
@@ -117,7 +118,7 @@ class SubscriptionScreen extends StatelessWidget {
             ),
           ),
           
-          SizedBox(width: 42.w), // Balance the back button
+          SizedBox(width: 42.w),
         ],
       ),
     );
@@ -222,7 +223,7 @@ class SubscriptionScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-                 return Dialog(
+          return Dialog(
            shape: RoundedRectangleBorder(
              borderRadius: BorderRadius.circular(4.r),
            ),

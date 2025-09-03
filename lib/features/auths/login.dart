@@ -92,12 +92,13 @@ class _LoginPageState extends State<LoginPage> {
                 onChanged: (value) {
                   uiController.setSelectedValue(value);
                 },
-                buttonWidth: 160,
-                buttonHeight: 50,
-                itemHeight: 50,
-                fontSize: 16,
+                buttonWidth: 89.w,
+                buttonHeight: 24.h,
+                itemHeight: 40,
+                fontSize: 12,
                 textColor: Colors.brown,
                 icon: const Icon(Icons.arrow_drop_down, color: Colors.brown),
+                buttonColor: Colors.transparent,
               ),
             ),
           ),
@@ -297,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
                     CustomButton(
                       text: "Google",
                       onPressed: () {},
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppColors.backgroundColor2,
                       textColor: Colors.black,
                       iconPath: AppAssets.googleIcon,
                       borderColor: Colors.black,

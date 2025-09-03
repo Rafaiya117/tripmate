@@ -91,7 +91,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
               width: 26.w,
               height: 26.w,
               decoration: BoxDecoration(
-                color: AppColors.disabled1,
+                // color: AppColors.disabled1,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Icon(

@@ -90,36 +90,6 @@ class ForgotPasswordPage extends StatelessWidget {
                       textColor: Colors.white,
                     ),
                     SizedBox(height: 20.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: AppColors.disabled3,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text("Or continue with"),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: AppColors.disabled3,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20.h),
-                    CustomButton(
-                      text: "Google",
-                      onPressed: () {},
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
-                      iconPath: AppAssets.googleIcon,
-                      borderColor: Colors.black,
-                    ),
-                    SizedBox(height: 20.h),
                     Center(
                       child: Text.rich(
                         TextSpan(
@@ -147,6 +117,36 @@ class ForgotPasswordPage extends StatelessWidget {
                           ],
                         ),
                       ),
+                    ),
+                    SizedBox(height: 20.h),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            thickness: 0.5,
+                            color: AppColors.disabled3,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text("Or continue with"),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            thickness: 0.5,
+                            color: AppColors.disabled3,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.h),
+                    CustomButton(
+                      text: "Google",
+                      onPressed: () {},
+                      backgroundColor: AppColors.backgroundColor2,
+                      textColor: Colors.black,
+                      iconPath: AppAssets.googleIcon,
+                      borderColor: Colors.black,
                     ),
                   ],
                 ),

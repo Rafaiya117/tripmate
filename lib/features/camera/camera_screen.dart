@@ -160,15 +160,15 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                             uiController.setLanguage(value);
                           }
                         },
-                        buttonWidth: 120,
-                        buttonHeight: 32,
+                        buttonWidth: 89.w,
+                        buttonHeight: 24.h,
                         itemHeight: 40,
                         fontSize: 12,
                         textColor: AppColors.iconColor,
                         padding: EdgeInsets.symmetric(horizontal: 10.w),
                         icon: Icon(
-                          Icons.keyboard_arrow_down,
-                          size: 16.sp,
+                          Icons.arrow_drop_down,
+                          size: 24.sp,
                           color: AppColors.iconColor,
                         ),
                       ),

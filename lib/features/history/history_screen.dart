@@ -62,7 +62,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               width: 26.w,
               height: 26.w,
               decoration: BoxDecoration(
-                color: AppColors.disabled2,
+                // color: AppColors.disabled2,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Icon(
@@ -91,17 +92,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
           SizedBox(width: 16.w),
           
           // Profile Button
-          Container(
-            width: 24.w,
-            height: 24.w,
-            decoration: BoxDecoration(
-              color: AppColors.disabled2,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: Icon(
-              Icons.person,
-              size: 16.sp,
-              color: AppColors.iconColor,
+          // Container(
+          //   width: 24.w,
+          //   height: 24.w,
+          //   decoration: BoxDecoration(
+          //     color: AppColors.disabled2,
+          //     borderRadius: BorderRadius.circular(4.r),
+          //   ),
+          //   child: Icon(
+          //     Icons.person,
+          //     size: 16.sp,
+          //     color: AppColors.iconColor,
+          //   ),
+          // ),
+          GestureDetector(
+            onTap: () {
+              context.push('/profile');
+            },
+            child: Container(
+              width: 24.w,
+              height: 24.w,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.iconColor, width: 2),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.person,
+                  size: 16.sp,
+                  color: AppColors.iconColor,
+                ),
+              ),
             ),
           ),
         ],
@@ -119,7 +141,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
             width: 20.w,
             height: 20.w,
             decoration: BoxDecoration(
-              color: AppColors.disabled2,
+              // color: AppColors.disabled2,
+              color: Colors.transparent,
               borderRadius: BorderRadius.circular(4.r),
             ),
             child: Icon(
@@ -160,7 +183,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               width: 20.w,
               height: 18.w,
               decoration: BoxDecoration(
-                color: AppColors.disabled2,
+                // color: AppColors.disabled2,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Icon(

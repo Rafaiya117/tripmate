@@ -29,7 +29,7 @@ class HistoryDetailsScreen extends StatelessWidget {
         });
 
         return Scaffold(
-          backgroundColor: AppColors.backgroundColor2,
+          backgroundColor: AppColors.backgroundColor1,
           body: _buildBody(context, controller),
         );
       },
@@ -395,8 +395,8 @@ class HistoryDetailsScreen extends StatelessWidget {
             ),
           ],
         ),
-        
-        SizedBox(height: 24.h),
+        SizedBox(width: double.infinity,child: Divider(color: AppColors.disabled1, height: 32.h),),
+        SizedBox(height: 5.h),
         
         // Description
         Text(

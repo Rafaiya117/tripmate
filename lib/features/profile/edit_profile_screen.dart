@@ -75,7 +75,8 @@ class EditProfileScreen extends StatelessWidget {
               width: 40.w,
               height: 40.w,
               decoration: BoxDecoration(
-                color: Colors.white,
+                // color: Colors.white,
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
@@ -86,7 +87,8 @@ class EditProfileScreen extends StatelessWidget {
                 ],
               ),
               child: Icon(
-                Icons.arrow_back_ios_new,
+                // Icons.arrow_back_ios_new,
+                Icons.arrow_back,
                 size: 20.sp,
                 color: AppColors.iconColor,
               ),
