@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                 onChanged: (value) {
                   uiController.setSelectedValue(value);
                 },
-                buttonWidth: 89.w,
+                buttonWidth: 120.w,
                 buttonHeight: 24.h,
                 itemHeight: 40,
                 fontSize: 12,
@@ -120,8 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 8.h),
                     CustomInputField(
-                      label: "Email *",
-                      hintText: "Enter your email",
+                      label: "Enter user email address",
+                      hintText: "example@mail.com",
                       controller: uiController.emailController,
                       isError: _emailError,
                       onChanged: (value) {
@@ -137,8 +137,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 10.h),
                     CustomInputField(
-                      label: "Password *",
-                      hintText: "Enter password",
+                      label: "Enter Password",
+                      hintText: "********",
                       controller: uiController.passwordController,
                       isPassword: true,
                       obscureText: uiController.obscurePassword,

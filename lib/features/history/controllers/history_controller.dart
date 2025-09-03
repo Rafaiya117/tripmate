@@ -160,7 +160,7 @@ class HistoryController extends ChangeNotifier {
         filterDate = DateTime(now.year - 1, now.month, now.day);
         break;
       default:
-        filterDate = DateTime(1900); // Show all items
+        filterDate = DateTime(1900); 
     }
 
     _filteredList = _historyList.where((history) {

@@ -19,8 +19,8 @@ class CameraScreen extends StatefulWidget {
   State<CameraScreen> createState() => _CameraScreenState();
 }
 
-class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver {
-
+class _CameraScreenState extends State<CameraScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -61,10 +61,6 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     });
   }
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Consumer3<CameraUIController, TripMateCameraController, AuthService>(
@@ -74,11 +70,14 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           body: Stack(
             children: [
               // Full Screen Camera Preview
-              if (cameraController.isInitialized && cameraController.cameraController != null)
+              if (cameraController.isInitialized &&
+                  cameraController.cameraController != null)
                 SizedBox(
                   width: double.infinity,
                   height: double.infinity,
-                  child: camera_package.CameraPreview(cameraController.cameraController!),
+                  child: camera_package.CameraPreview(
+                    cameraController.cameraController!,
+                  ),
                 )
               else
                 // Camera preview placeholder
@@ -113,11 +112,11 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                               fontSize: 14.sp,
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              
+
               // Top Controls Overlay
               Positioned(
                 top: 50.h,
@@ -149,7 +148,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                           padding: EdgeInsets.zero,
                         ),
                       ),
-                      
+
                       // Language Dropdown
                       CustomDropdown(
                         items: ['English', '简体中文', '繁體中文'],
@@ -176,7 +175,6 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                   ),
                 ),
               ),
-              
               // Bottom Controls Overlay
               Positioned(
                 bottom: 50.h,
@@ -184,7 +182,11 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                 right: 0,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  child: _buildCameraControls(context, cameraController, authService),
+                  child: _buildCameraControls(
+                    context,
+                    cameraController,
+                    authService,
+                  ),
                 ),
               ),
             ],
@@ -194,9 +196,11 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
     );
   }
 
-  
-
-  Widget _buildCameraControls(BuildContext context, TripMateCameraController cameraController, AuthService authService) {
+  Widget _buildCameraControls(
+    BuildContext context,
+    TripMateCameraController cameraController,
+    AuthService authService,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -205,22 +209,19 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           width: 30.w,
           height: 30.w,
           decoration: BoxDecoration(
+            // ignore: deprecated_member_use
             color: Colors.black.withOpacity(0.5),
             borderRadius: BorderRadius.circular(15.r),
           ),
           child: IconButton(
-            icon: Icon(
-              Icons.photo_library,
-              size: 18.sp,
-              color: Colors.white,
-            ),
+            icon: Icon(Icons.photo_library, size: 18.sp, color: Colors.white),
             onPressed: () {
               cameraController.openGallery();
             },
             padding: EdgeInsets.zero,
           ),
         ),
-        
+
         // Camera Shutter Button
         Center(
           child: Stack(
@@ -231,10 +232,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                 height: 64.w,
                 decoration: ShapeDecoration(
                   shape: OvalBorder(
-                    side: BorderSide(
-                      width: 2.w,
-                      color: Colors.white,
-                    ),
+                    side: BorderSide(width: 2.w, color: Colors.white),
                   ),
                 ),
               ),
@@ -242,17 +240,19 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
               Positioned(
                 left: 4.w,
                 top: 4.w,
-                                 child: GestureDetector(
-                   onTap: cameraController.isCapturing 
-                     ? null 
-                                             : () async {
+                child: GestureDetector(
+                  onTap: cameraController.isCapturing
+                      ? null
+                      : () async {
                           // Check if user is authenticated
                           if (!authService.isAuthenticated()) {
                             // Capture photo first
                             await cameraController.capturePhoto();
                             if (cameraController.lastCapturedImage != null) {
                               // Store the captured image path for after login
-                              await authService.setPendingImagePath(cameraController.lastCapturedImage!);
+                              await authService.setPendingImagePath(
+                                cameraController.lastCapturedImage!,
+                              );
                               // Reset camera state
                               cameraController.resetCameraState();
                               // Show login screen
@@ -260,11 +260,13 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                             }
                             return;
                           }
-                          
+
                           await cameraController.capturePhoto();
                           if (cameraController.lastCapturedImage != null) {
                             // Navigate to image view screen with the captured image
-                            context.push('/image_view?imagePath=${Uri.encodeComponent(cameraController.lastCapturedImage!)}');
+                            context.push(
+                              '/image_view?imagePath=${Uri.encodeComponent(cameraController.lastCapturedImage!)}',
+                            );
                             // Reset camera state after navigation
                             cameraController.resetCameraState();
                           }
@@ -273,32 +275,32 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                     width: 56.w,
                     height: 56.w,
                     decoration: ShapeDecoration(
-                      color: cameraController.isCapturing 
-                        ? Colors.grey 
-                        : Colors.white,
+                      color: cameraController.isCapturing
+                          ? Colors.grey
+                          : Colors.white,
                       shape: const OvalBorder(),
                     ),
                     child: cameraController.isCapturing
-                      ? Center(
-                          child: SizedBox(
-                            width: 20.w,
-                            height: 20.w,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.w,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
+                        ? Center(
+                            child: SizedBox(
+                              width: 20.w,
+                              height: 20.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.w,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      : null,
+                          )
+                        : null,
                   ),
                 ),
               ),
             ],
           ),
         ),
-        
+
         // Recent Button
         Container(
           width: 30.w,
@@ -308,11 +310,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
             borderRadius: BorderRadius.circular(15.r),
           ),
           child: IconButton(
-            icon: Icon(
-              Icons.history,
-              size: 18.sp,
-              color: Colors.white,
-            ),
+            icon: Icon(Icons.history, size: 18.sp, color: Colors.white),
             onPressed: () {
               context.push('/history');
             },
@@ -322,6 +320,4 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
       ],
     );
   }
-
-
 }

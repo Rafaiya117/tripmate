@@ -16,7 +16,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
-
+   bool _isSearchFocused = false;
   @override
   void dispose() {
     _searchController.dispose();
@@ -27,25 +27,54 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor2,
-      body: Consumer<HistoryController>(
-        builder: (context, historyController, child) {
-          return SafeArea(
-            child: Column(
-              children: [
-                // App Bar
-                _buildAppBar(context, historyController),
+      // body: Consumer<HistoryController>(
+      //   builder: (context, historyController, child) {
+      //     return SafeArea(
+      //       child: Column(
+      //         children: [
+      //           // App Bar
+      //           _buildAppBar(context, historyController),
                 
-                // Search and Filter Bar
-                _buildSearchBar(context, historyController),
+      //           // Search and Filter Bar
+      //           _buildSearchBar(context, historyController),
                 
-                // Content
-                Expanded(
-                  child: _buildContent(context, historyController),
+      //           // Content
+      //           Expanded(
+      //             child: _buildContent(context, historyController),
+      //           ),
+      //         ],
+      //       ),
+      //     );
+      //   },
+      // ),
+
+      body: Stack(
+        children: [
+          Consumer<HistoryController>(
+            builder: (context, historyController, child) {
+              return SafeArea(
+                child: Column(
+                  children: [
+                    _buildAppBar(context, historyController),
+                    _buildSearchBar(context, historyController),
+                    Expanded(child: _buildContent(context, historyController)),
+                  ],
                 ),
-              ],
+              );
+            },
+          ),
+          if (_isSearchFocused)
+            GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                setState(() => _isSearchFocused = false);
+              },
+              child: Container(
+                // ignore: deprecated_member_use
+                color: Colors.black.withOpacity(0.7),
+              ),
             ),
-          );
-        },
+        ],
       ),
     );
   }
@@ -155,10 +184,35 @@ class _HistoryScreenState extends State<HistoryScreen> {
           SizedBox(width: 8.w),
           
           // Search TextField
+          // Expanded(
+          //   child: TextField(
+          //     controller: _searchController,
+          //     onChanged: controller.searchHistory,
+          //     decoration: InputDecoration(
+          //       hintText: 'Search history...',
+          //       hintStyle: GoogleFonts.inter(
+          //         color: AppColors.labelTextColor,
+          //         fontSize: 14.sp,
+          //       ),
+          //       border: InputBorder.none,
+          //       contentPadding: EdgeInsets.symmetric(vertical: 8.h),
+          //     ),
+          //     style: GoogleFonts.inter(
+          //       color: AppColors.textColor1,
+          //       fontSize: 14.sp,
+          //     ),
+          //   ),
+          // ),
           Expanded(
             child: TextField(
               controller: _searchController,
               onChanged: controller.searchHistory,
+              onTap: () {
+                setState(() => _isSearchFocused = true);
+              },
+              onEditingComplete: () {
+                setState(() => _isSearchFocused = false);
+              },
               decoration: InputDecoration(
                 hintText: 'Search history...',
                 hintStyle: GoogleFonts.inter(
@@ -174,9 +228,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ),
-          
           SizedBox(width: 8.w),
-          
           // Filter Icon with Dropdown
           PopupMenuButton<String>(
             icon: Container(
