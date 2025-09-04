@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:trip_mate/config/assets/assets.dart';
 import 'package:trip_mate/config/colors/colors.dart';
 import 'package:trip_mate/features/history/controllers/history_controller.dart';
 import 'package:trip_mate/features/history/widgets/history_card.dart';
@@ -16,38 +17,21 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
-   bool _isSearchFocused = false;
+  bool _isSearchFocused = false;
+  bool _isSearchOverlayVisible = false;
+  final TextEditingController _searchOverlayController = TextEditingController();
+
   @override
   void dispose() {
     _searchController.dispose();
+     _searchOverlayController.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor2,
-      // body: Consumer<HistoryController>(
-      //   builder: (context, historyController, child) {
-      //     return SafeArea(
-      //       child: Column(
-      //         children: [
-      //           // App Bar
-      //           _buildAppBar(context, historyController),
-                
-      //           // Search and Filter Bar
-      //           _buildSearchBar(context, historyController),
-                
-      //           // Content
-      //           Expanded(
-      //             child: _buildContent(context, historyController),
-      //           ),
-      //         ],
-      //       ),
-      //     );
-      //   },
-      // ),
-
       body: Stack(
         children: [
           Consumer<HistoryController>(
@@ -63,17 +47,90 @@ class _HistoryScreenState extends State<HistoryScreen> {
               );
             },
           ),
+          
+          // Tap outside to unfocus search
           if (_isSearchFocused)
             GestureDetector(
               onTap: () {
                 FocusScope.of(context).unfocus();
                 setState(() => _isSearchFocused = false);
               },
+              // ignore: deprecated_member_use
+              child: Container(color: Colors.black.withOpacity(0.7)),
+            ),
+
+          // ✅ Fullscreen search overlay
+          if (_isSearchOverlayVisible)
+            Positioned.fill(
               child: Container(
                 // ignore: deprecated_member_use
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withOpacity(0.9),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Search input (left)
+                          Expanded(
+                            child: TextField(
+                              controller: _searchOverlayController,
+                              autofocus: true,
+                              onSubmitted: (query) {
+                                context.read<HistoryController>().searchHistory(
+                                  query,
+                                );
+                                setState(() {
+                                  _isSearchOverlayVisible = false;
+                                });
+                              },
+                              textInputAction: TextInputAction.search,
+                              textAlign:TextAlign.left, // Left aligned input text
+                              style: GoogleFonts.inter(
+                                fontSize: 16.sp,
+                                color: Colors.white,
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'Search',
+                                hintStyle: GoogleFonts.inter(
+                                  fontSize: 16.sp,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(width: 16.w),
+
+                          // Cancel (right)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isSearchOverlayVisible = false;
+                                _searchOverlayController.clear();
+                              });
+                            },
+                            child: Text(
+                              'Cancel',
+                            style: GoogleFonts.inter(
+                              fontSize: 16.sp,
+                              color: Colors.amberAccent,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
+          ),
         ],
       ),
     );
@@ -102,9 +159,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ),
-          
           SizedBox(width: 16.w),
-          
           // Title
           Expanded(
             child: Text(
@@ -117,9 +172,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               textAlign: TextAlign.center,
             ),
           ),
-          
           SizedBox(width: 16.w),
-          
           // Profile Button
           // Container(
           //   width: 24.w,
@@ -165,44 +218,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       child: Row(
         children: [
-          // Search Icon
-          Container(
-            width: 20.w,
-            height: 20.w,
-            decoration: BoxDecoration(
-              // color: AppColors.disabled2,
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(4.r),
-            ),
-            child: Icon(
-              Icons.search,
-              size: 14.sp,
-              color: AppColors.iconColor,
-            ),
-          ),
-          
-          SizedBox(width: 8.w),
-          
-          // Search TextField
-          // Expanded(
-          //   child: TextField(
-          //     controller: _searchController,
-          //     onChanged: controller.searchHistory,
-          //     decoration: InputDecoration(
-          //       hintText: 'Search history...',
-          //       hintStyle: GoogleFonts.inter(
-          //         color: AppColors.labelTextColor,
-          //         fontSize: 14.sp,
-          //       ),
-          //       border: InputBorder.none,
-          //       contentPadding: EdgeInsets.symmetric(vertical: 8.h),
-          //     ),
-          //     style: GoogleFonts.inter(
-          //       color: AppColors.textColor1,
-          //       fontSize: 14.sp,
-          //     ),
-          //   ),
-          // ),
+          Spacer(),
           Expanded(
             child: TextField(
               controller: _searchController,
@@ -214,7 +230,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 setState(() => _isSearchFocused = false);
               },
               decoration: InputDecoration(
-                hintText: 'Search history...',
+                hintText: '',
                 hintStyle: GoogleFonts.inter(
                   color: AppColors.labelTextColor,
                   fontSize: 14.sp,
@@ -229,41 +245,47 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
           SizedBox(width: 8.w),
-          // Filter Icon with Dropdown
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isSearchOverlayVisible = true;
+              });
+            },
+            child: Container(
+              width: 20.w,
+              height: 20.w,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(4.r),
+              ),
+              child: Icon(Icons.search, size: 15.sp, color: AppColors.iconColor),
+            ),
+          ),
+          SizedBox(width: 8.w),
           PopupMenuButton<String>(
             icon: Container(
               width: 20.w,
               height: 18.w,
               decoration: BoxDecoration(
-                // color: AppColors.disabled2,
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(4.r),
               ),
-              child: Icon(
-                Icons.filter_list,
-                size: 14.sp,
-                color: AppColors.iconColor,
+              child: Image.asset(
+                AppAssets.sort_icon,
+                width: 20.w,
+                height: 18.h,
               ),
             ),
             onSelected: (value) => _applyFilter(controller, value),
             itemBuilder: (BuildContext context) => [
+              // Filter items
               PopupMenuItem<String>(
                 value: 'week',
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 18.sp,
-                      color: AppColors.iconColor,
-                    ),
+                    Icon(Icons.calendar_today, size: 18.sp, color: AppColors.iconColor),
                     SizedBox(width: 12.w),
-                    Text(
-                      'Last week',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: AppColors.textColor1,
-                      ),
-                    ),
+                    Text('Last week', style: GoogleFonts.inter(fontSize: 14.sp, color: AppColors.textColor1)),
                   ],
                 ),
               ),
@@ -271,19 +293,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 value: 'month',
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.calendar_month,
-                      size: 18.sp,
-                      color: AppColors.iconColor,
-                    ),
+                    Icon(Icons.calendar_month, size: 18.sp, color: AppColors.iconColor),
                     SizedBox(width: 12.w),
-                    Text(
-                      'Last month',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: AppColors.textColor1,
-                      ),
-                    ),
+                    Text('Last month', style: GoogleFonts.inter(fontSize: 14.sp, color: AppColors.textColor1)),
                   ],
                 ),
               ),
@@ -291,19 +303,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 value: 'year',
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.calendar_view_month,
-                      size: 18.sp,
-                      color: AppColors.iconColor,
-                    ),
+                    Icon(Icons.calendar_view_month, size: 18.sp, color: AppColors.iconColor),
                     SizedBox(width: 12.w),
-                    Text(
-                      'Last year',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: AppColors.textColor1,
-                      ),
-                    ),
+                    Text('Last year', style: GoogleFonts.inter(fontSize: 14.sp, color: AppColors.textColor1)),
                   ],
                 ),
               ),
@@ -311,26 +313,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 value: 'clear',
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.clear,
-                      size: 18.sp,
-                      color: Colors.red,
-                    ),
+                    Icon(Icons.clear, size: 18.sp, color: Colors.red),
                     SizedBox(width: 12.w),
-                    Text(
-                      'Clear filter',
-                      style: GoogleFonts.inter(
-                        fontSize: 14.sp,
-                        color: Colors.red,
-                      ),
-                    ),
+                    Text('Clear filter', style: GoogleFonts.inter(fontSize: 14.sp, color: Colors.red)),
                   ],
                 ),
               ),
             ],
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
             elevation: 8,
             offset: Offset(0, 8.h),
           ),
@@ -415,10 +405,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
         itemCount: controller.filteredList.length,
         itemBuilder: (context, index) {
           final history = controller.filteredList[index];
-          return HistoryCard(
-            history: history,
-            onDelete: () => _showDeleteDialog(context, controller, history.id),
-            onTap: () => _onHistoryTap(context, history),
+
+          return Column(
+            children: [
+              if (index != 0) const Divider(thickness: 2, height: 16),
+              HistoryCard(
+                history: history,
+                onDelete: () =>
+                  _showDeleteDialog(context, controller, history.id),
+                onTap: () => _onHistoryTap(context, history),
+              ),
+            ],
           );
         },
       ),

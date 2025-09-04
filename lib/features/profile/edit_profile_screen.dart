@@ -38,12 +38,10 @@ class EditProfileScreen extends StatelessWidget {
               children: [
                 // App Bar
                 _buildAppBar(context),
-                
                 SizedBox(height: 32.h),
                 
                 // Profile Image Section
                 _buildProfileImageSection(context, controller),
-                
                 SizedBox(height: 40.h),
                 
                 // Form Fields
@@ -94,9 +92,7 @@ class EditProfileScreen extends StatelessWidget {
               ),
             ),
           ),
-          
           SizedBox(width: 20.w),
-          
           // Title
           Expanded(
             child: Text(
@@ -122,17 +118,14 @@ class EditProfileScreen extends StatelessWidget {
         // Profile Image Container
         Center(
           child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              // Profile Image
               Container(
                 width: 120.w,
                 height: 120.w,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primaryColor,
-                    width: 4.w,
-                  ),
+                  border: Border.all(color: AppColors.primaryColor, width: 4.w),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primaryColor.withOpacity(0.2),
@@ -143,34 +136,35 @@ class EditProfileScreen extends StatelessWidget {
                 ),
                 child: ClipOval(
                   child: controller.selectedImage != null
-                      ? Image.file(
-                          controller.selectedImage!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildDefaultProfileImage();
-                          },
-                        )
+                    ? Image.file(
+                      controller.selectedImage!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildDefaultProfileImage();
+                        },
+                      )
                       : Image.network(
-                          controller.currentImageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildDefaultProfileImage();
-                          },
-                        ),
+                        controller.currentImageUrl,
+                        fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildDefaultProfileImage();
+                    },
+                  ),
                 ),
               ),
-              
+
               // Camera Icon Overlay
               Positioned(
-                bottom: 0,
-                right: 0,
+                bottom: 45,
+                right: 45,
                 child: GestureDetector(
                   onTap: () => controller.showImagePickerOptions(context),
                   child: Container(
                     width: 36.w,
                     height: 36.w,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
+                      //color: AppColors.primaryColor,
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.circular(12.r),
                       boxShadow: [
                         BoxShadow(
@@ -181,7 +175,7 @@ class EditProfileScreen extends StatelessWidget {
                       ],
                     ),
                     child: Icon(
-                      Icons.camera_alt,
+                      Icons.camera_alt_outlined,
                       size: 20.sp,
                       color: Colors.white,
                     ),
@@ -236,7 +230,7 @@ class EditProfileScreen extends StatelessWidget {
           keyboardType: TextInputType.name,
         ),
         
-        SizedBox(height: 24.h),
+        SizedBox(height: 15.h),
         
         // Email Field
         CustomTextField(
@@ -255,7 +249,8 @@ class EditProfileScreen extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
         ),
         
-        SizedBox(height: 24.h),
+        // SizedBox(height: 24.h),
+        SizedBox(height: 15.h),
         
         // Old Password Field
         CustomTextField(
@@ -272,7 +267,8 @@ class EditProfileScreen extends StatelessWidget {
           },
         ),
         
-        SizedBox(height: 24.h),
+        // SizedBox(height: 24.h),
+        SizedBox(height: 15.h),
         
         // New Password Field
         CustomTextField(
@@ -303,6 +299,7 @@ class EditProfileScreen extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.primaryColor,
+            // ignore: deprecated_member_use
             AppColors.primaryColor.withOpacity(0.8),
           ],
           begin: Alignment.topLeft,

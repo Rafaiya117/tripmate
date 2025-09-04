@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trip_mate/config/colors/colors.dart';
+import 'package:trip_mate/features/camera/custom_widget/custome_circle_indigator_widget.dart';
 
 class ImageViewScreen extends StatefulWidget {
   final String imagePath;
@@ -208,22 +209,48 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
               SizedBox(
                 width: 20.w,
                 height: 20.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.w,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    const Color(0xFF6B7280),
-                  ),
+                child: SegmentedSpinner(
+                  size: 40.w,
+                  color: const Color(0xFF6B7280),
                 ),
+                // CircularProgressIndicator(
+                //   strokeWidth: 2.w,
+                //   valueColor: AlwaysStoppedAnimation<Color>(
+                //     const Color(0xFF6B7280),
+                //   ),
+                // ),
               ),
               SizedBox(width: 8.w),
-              Text(
-                'Analyzing ${_analyzingTime}s',
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF6B7280),
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Analyzing ',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF6B7280), // Gray color
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '${_analyzingTime}s',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFFFF7A00), // Orange color
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
+              // Text(
+              //   'Analyzing ${_analyzingTime}s',
+              //   style: GoogleFonts.inter(
+              //     color: const Color(0xFF6B7280),
+              //     fontSize: 16.sp,
+              //     fontWeight: FontWeight.w500,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -239,7 +266,7 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
             width: 200.w,
             height: 48.h,
             decoration: ShapeDecoration(
-              color: AppColors.primaryColor,
+              color: Color(0xFFFF7A00),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.r),
               ),
@@ -256,11 +283,26 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
                   ),
                 ),
                 SizedBox(width: 8.w),
-                Icon(
-                  Icons.flash_on,
-                  size: 20.sp,
-                  color: Colors.white,
+                Container(
+                  width: 32.sp,
+                  height: 32.sp,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.flash_on,
+                      size: 20.sp,
+                      color: Color(0xFFFF7A00),
+                    ),
+                  ),
                 ),
+                // Icon(
+                //   Icons.flash_on,
+                //   size: 20.sp,
+                //   color: Colors.white,
+                // ),
               ],
             ),
           ),

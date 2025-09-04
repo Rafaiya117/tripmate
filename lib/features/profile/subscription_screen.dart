@@ -170,8 +170,8 @@ class SubscriptionScreen extends StatelessWidget {
           SubscriptionButton(
             text: 'Upgrade plan',
             onPressed: subscription.canUpgrade 
-                ? () => _handleUpgrade(context, controller)
-                : null,
+              ? () => _handleUpgrade(context, controller)
+              : null,
             isLoading: controller.isUpgrading,
             isPrimary: true,
           ),
@@ -182,8 +182,8 @@ class SubscriptionScreen extends StatelessWidget {
           SubscriptionButton(
             text: 'Cancel subscription',
             onPressed: subscription.canCancel 
-                ? () => _handleCancel(context, controller)
-                : null,
+              ? () => _handleCancel(context, controller)
+              : null,
             isLoading: controller.isCancelling,
             isPrimary: false,
             icon: Icons.close,

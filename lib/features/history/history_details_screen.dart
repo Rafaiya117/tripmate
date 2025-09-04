@@ -27,7 +27,7 @@ class HistoryDetailsScreen extends StatelessWidget {
             controller.loadHistoryDetails(historyId);
           }
         });
-
+        
         return Scaffold(
           backgroundColor: AppColors.backgroundColor1,
           body: _buildBody(context, controller),
@@ -78,6 +78,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
+                        // ignore: deprecated_member_use
                         Colors.black.withOpacity(0.3),
                       ],
                     ),
@@ -160,7 +161,7 @@ class HistoryDetailsScreen extends StatelessWidget {
               child: Icon(
                 Icons.arrow_back,
                 color: AppColors.iconColor,
-                size: 20.sp,
+                size: 22.sp,
               ),
             ),
           ),
@@ -199,6 +200,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
+                      // ignore: deprecated_member_use
                       Colors.black.withOpacity(0.3),
                     ],
                   ),
@@ -337,6 +339,37 @@ class HistoryDetailsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        //!-----tollbar on scroll-------------!
+        Column(
+          children: [
+            SizedBox(height: 8.h),
+            Center(
+              child: Column(
+                children: [
+                  Container(
+                    width: 40.w,
+                    height: 2.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.iconColor,
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  Container(
+                    width: 40.w,
+                    height: 2.h,
+                    decoration: BoxDecoration(
+                      color: AppColors.iconColor,
+                      borderRadius: BorderRadius.circular(2.r),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16.h),
+          ],
+        ),
+        //!-----------------------------------!
         // Title
         Text(
           'Red Fort - Historical Monument',
@@ -364,7 +397,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                 Text(
                   'Delhi, India',
                   style: GoogleFonts.inter(
-                    color: AppColors.textColor1,
+                    color: AppColors.iconColor,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                   ),
@@ -386,7 +419,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                 Text(
                   '1648',
                   style: GoogleFonts.inter(
-                    color: AppColors.textColor1,
+                    color: AppColors.iconColor,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                   ),
@@ -437,8 +470,6 @@ class HistoryDetailsScreen extends StatelessWidget {
         ),
         
         SizedBox(height: 24.h),
-        
-
       ],
     );
   }
@@ -505,9 +536,9 @@ class HistoryDetailsScreen extends StatelessWidget {
             ),
           ],
         ),
-        
-        SizedBox(height: 24.h),
-        
+        SizedBox(width: double.infinity,child: Divider(color: AppColors.disabled1, height: 24.h),),
+        // SizedBox(height: 24.h),
+        SizedBox(height: 10.h,),
         // Description
         RichTextWidget(
           text: details.description,

@@ -21,7 +21,7 @@ class HistoryCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: 16.h),
+        // margin: EdgeInsets.only(bottom: 16.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.r),
           boxShadow: [
@@ -67,64 +67,65 @@ class HistoryCard extends StatelessWidget {
               Positioned(
                 top: 12.h,
                 left: 12.w,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(4.w,), 
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8.r,), 
+                      ),
+                      child: Icon(
+                        Icons.calendar_month_outlined,
                         size: 12.sp,
                         color: AppColors.iconColor,
                       ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      history.date,
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Location Badge (if available)
+              if (history.location != null)
+                Positioned(
+                  top: 12.h,
+                  left: 130.w,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(4.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Icon(
+                          Icons.location_on,
+                          size: 12.sp,
+                          color: AppColors.iconColor,
+                        ),
+                      ),
                       SizedBox(width: 4.w),
                       Text(
-                        history.date,
+                        history.location!,
                         style: GoogleFonts.inter(
-                          color: AppColors.iconColor,
+                          // color: AppColors.iconColor,
+                          color: Colors.white,
                           fontSize: 10.sp,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],
-                  ),
-                ),
-              ),
-              // Location Badge (if available)
-              if (history.location != null)
-                Positioned(
-                  top: 12.h,
-                  // left: 120.w,
-                  left: 130.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 12.sp,
-                          color: AppColors.iconColor,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          history.location!,
-                          style: GoogleFonts.inter(
-                            color: AppColors.iconColor,
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
 

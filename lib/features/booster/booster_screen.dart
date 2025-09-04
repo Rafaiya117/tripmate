@@ -45,13 +45,14 @@ class BoosterScreen extends StatelessWidget {
               width: 26.w,
               height: 26.w,
               decoration: BoxDecoration(
-                color: const Color(0xFFD9D9D9),
+                //color: const Color(0xFFD9D9D9),
+                color: Colors.transparent,
                 borderRadius: BorderRadius.circular(4.r),
               ),
               child: Icon(
                 Icons.arrow_back,
                 size: 18.sp,
-                color: AppColors.textColor1,
+                color: AppColors.iconColor,
               ),
             ),
           ),
@@ -118,16 +119,21 @@ class BoosterScreen extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: ListView.builder(
         padding: EdgeInsets.only(top: 20.h),
         itemCount: controller.boosters.length,
         itemBuilder: (context, index) {
-          final booster = controller.boosters[index];
-          return BoosterCard(
-            booster: booster,
-            isSelected: controller.selectedBoosterId == booster.id,
-            onTap: () => _handleBoosterTap(context, controller, booster),
+        final booster = controller.boosters[index];
+          return Column(
+            children: [
+              if (index == 1) SizedBox(height: 25.h),
+              BoosterCard(
+                booster: booster,
+                isSelected: controller.selectedBoosterId == booster.id,
+                onTap: () => _handleBoosterTap(context, controller, booster),
+              ),
+            ],
           );
         },
       ),

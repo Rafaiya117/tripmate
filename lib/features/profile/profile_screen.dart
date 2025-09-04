@@ -79,22 +79,22 @@ class ProfileScreen extends StatelessWidget {
               // Profile Image Section
               _buildProfileImageSection(profile),
               
-              SizedBox(height: 20.h),
+              SizedBox(height: 8.h),
               
               // Boosted Badge
               if (profile.isBoosted) _buildBoostedBadge(),
               
-              SizedBox(height: 20.h),
+              SizedBox(height: 10.h),
               
               // User Info
               _buildUserInfo(profile),
               
-              SizedBox(height: 20.h),
+              SizedBox(height: 10.h),
               
               // Separator
               _buildSeparator(),
               
-              SizedBox(height: 20.h),
+              SizedBox(height: 10.h),
               
               // Time Remaining Section
               _buildTimeRemainingSection(profile),
@@ -241,7 +241,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildSeparator() {
     return Container(
       width: double.infinity,
-      height: 0.5,
+      height: 1,
       color: AppColors.disabled2,
     );
   }
@@ -318,7 +318,7 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         children: [
           ProfileMenuItem(
-            icon: Icons.edit,
+            icon: Icons.border_color,
             title: 'Edit profile',
             onTap: () {
               // Navigate to edit profile screen
@@ -326,7 +326,7 @@ class ProfileScreen extends StatelessWidget {
             },
           ),
           ProfileMenuItem(
-            icon: Icons.bookmark,
+            icon: Icons.card_membership,
             title: 'Subscription',
             onTap: () {
               // Navigate to subscription screen

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:trip_mate/config/theme.dart';
 import 'package:trip_mate/features/splash/controllers/splash_controller.dart';
-import 'package:trip_mate/features/splash/controllers/animation_controller.dart';
+
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -129,9 +129,9 @@ class _SplashScreenWrapperState extends State<_SplashScreenWrapper>
                               ),
                               child: Center(
                                 child: Image.asset(
-                                  AppAssets.logo,
-                                  width: 60.w,
-                                  height: 60.w,
+                                  AppAssets.logo2,
+                                  width: 110.w,
+                                  height: 110.h,
                                   fit: BoxFit.contain,
                                 ),
                               ),

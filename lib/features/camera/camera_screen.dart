@@ -132,13 +132,13 @@ class _CameraScreenState extends State<CameraScreen>
                         width: 24.w,
                         height: 24.w,
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
+                          color: Colors.transparent,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: IconButton(
                           icon: Icon(
-                            Icons.settings,
-                            size: 16.sp,
+                            Icons.brightness_7,
+                            size: 24.sp,
                             color: Colors.white,
                           ),
                           onPressed: () {
@@ -214,7 +214,7 @@ class _CameraScreenState extends State<CameraScreen>
             borderRadius: BorderRadius.circular(15.r),
           ),
           child: IconButton(
-            icon: Icon(Icons.photo_library, size: 18.sp, color: Colors.white),
+            icon: Icon(Icons.panorama, size: 18.sp, color: Colors.white),
             onPressed: () {
               cameraController.openGallery();
             },

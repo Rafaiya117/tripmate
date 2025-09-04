@@ -23,7 +23,8 @@ class BoosterCard extends StatelessWidget {
       child: Container(
         width: 351.w,
         height: 52.h,
-        margin: EdgeInsets.only(bottom: 8.h),
+        //margin: EdgeInsets.only(bottom: 8.h),
+        margin: EdgeInsets.only(bottom: 15.h),
         decoration: ShapeDecoration(
           color: AppColors.primaryColor,
           shape: RoundedRectangleBorder(
@@ -39,7 +40,8 @@ class BoosterCard extends StatelessWidget {
                 width: 24.w,
                 height: 24.w,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD9D9D9),
+                  //color: const Color(0xFFD9D9D9),
+                  color:Colors.transparent,
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: _buildIcon(),
@@ -95,7 +97,8 @@ class BoosterCard extends StatelessWidget {
         );
       case 'calendar':
         return Icon(
-          Icons.calendar_today,
+          // Icons.calendar_today,
+          Icons.access_time,
           size: 16.sp,
           color: AppColors.textColor1,
         );
