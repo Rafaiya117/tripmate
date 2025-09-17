@@ -137,19 +137,24 @@ class SignUp extends StatelessWidget {
                           uiController.passwordController.text,
                         );
                         if (success) {
-                          // Check if there's a pending image path
-                          if (authService.pendingImagePath != null) {
-                            // Navigate to image view screen with the pending image
-                            final imagePath = authService.pendingImagePath!;
-                            await authService.clearPendingImagePath(); // Clear the pending path
-                            context.go('/image_view?imagePath=${Uri.encodeComponent(imagePath)}');
-                          } else {
-                            // Navigate to camera screen if no pending image
-                            context.go('/camera');
-                          }
+                          WidgetsBinding.instance.addPostFrameCallback((
+                            _,
+                          ) async {
+                            if (authService.pendingImagePath != null) {
+                              final imagePath = authService.pendingImagePath!;
+                              await authService
+                                  .clearPendingImagePath(); // Clear the pending path
+                              context.go(
+                                '/image_view?imagePath=${Uri.encodeComponent(imagePath)}',
+                              );
+                            } else {
+                              context.go('/camera');
+                            }
+                          });
                         } else {
-                          // Show error message
-                          authController.setErrorMessage('Sign up failed. Please try again.');
+                          authController.setErrorMessage(
+                            'Sign up failed. Please try again.',
+                          );
                         }
                       },
                       backgroundColor: AppColors.primaryColors,

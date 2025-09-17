@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,104 +20,180 @@ class AuthService extends ChangeNotifier {
   String? get userEmail => _userEmail;
   String? get pendingImagePath => _pendingImagePath;
 
+  String? _token;
+  final String _tokenKey = "auth_token";
+  
+
   AuthService() {
     _loadAuthState();
   }
 
   // Load authentication state from SharedPreferences
   Future<void> _loadAuthState() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      _isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
-      _userId = prefs.getString(_userIdKey);
-      _userEmail = prefs.getString(_userEmailKey);
-      _pendingImagePath = prefs.getString(_pendingImagePathKey);
-      notifyListeners();
-    } catch (e) {
-      print('Error loading auth state: $e');
-    }
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    _isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
+    _userId = prefs.getString(_userIdKey);
+    _userEmail = prefs.getString(_userEmailKey);
+    _pendingImagePath = prefs.getString(_pendingImagePathKey);
+    _token = prefs.getString(_tokenKey); 
+    notifyListeners();
+  } catch (e) {
+    print('Error loading auth state: $e');
   }
+}
 
   // Save authentication state to SharedPreferences
   Future<void> _saveAuthState() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_isLoggedInKey, _isLoggedIn);
-      if (_userId != null) {
-        await prefs.setString(_userIdKey, _userId!);
-      }
-      if (_userEmail != null) {
-        await prefs.setString(_userEmailKey, _userEmail!);
-      }
-      if (_pendingImagePath != null) {
-        await prefs.setString(_pendingImagePathKey, _pendingImagePath!);
-      }
-    } catch (e) {
-      print('Error saving auth state: $e');
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isLoggedInKey, _isLoggedIn);
+    if (_userId != null) {
+      await prefs.setString(_userIdKey, _userId!);
     }
+    if (_userEmail != null) {
+      await prefs.setString(_userEmailKey, _userEmail!);
+    }
+    if (_pendingImagePath != null) {
+      await prefs.setString(_pendingImagePathKey, _pendingImagePath!);
+    }
+    if (_token != null) {
+      await prefs.setString(_tokenKey, _token!); 
+    }
+    // Optional: save refresh token too
+    // if (refreshToken != null) {
+    //   await prefs.setString("refresh_token", refreshToken);
+    // }
+  } catch (e) {
+    print('Error saving auth state: $e');
   }
+}
+
+
 
   // Login user
   Future<bool> login(String email, String password) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      // For demo purposes, accept any valid email/password
-      if (email.isNotEmpty && password.isNotEmpty) {
+  try {
+    _isLoading = true;
+    notifyListeners();
+    debugPrint("!---------Attempting login with email: $email");
+
+    const String apiUrl = "https://tourapi.dailo.app/api/users/login/";
+
+    final dio = Dio();
+    final response = await dio.post(
+      apiUrl,
+      data: {
+        "email": email,
+        "password": password,
+      },
+      options: Options(
+        headers: {"Content-Type": "application/json"},
+      ),
+    );
+
+    debugPrint("API Response Status: ${response.statusCode}");
+    debugPrint("API Response Data: ${response.data}");
+
+    if (response.statusCode == 200) {
+      final data = response.data;
+
+      if (data["access"] != null) {
         _isLoggedIn = true;
-        _userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-        _userEmail = email;
-        
+        _userId = data["user"]?["id"]?.toString();
+        _userEmail = data["user"]?["email"]?.toString();
+
+        // Save both tokens
+        _token = data["access"]?.toString();
+        final refreshToken = data["refresh"]?.toString();
+
         await _saveAuthState();
+
+        debugPrint("Login success!");
+        debugPrint("User ID: $_userId");
+        debugPrint("User Email: $_userEmail");
+        debugPrint("Access Token: $_token");
+        debugPrint("Refresh Token: $refreshToken");
+
         _isLoading = false;
         notifyListeners();
         return true;
+      } else {
+        debugPrint("Login failed: No access token in response.");
       }
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    } catch (e) {
-      print('Login error: $e');
-      _isLoading = false;
-      notifyListeners();
-      return false;
+    } else {
+      debugPrint("Login failed: Server returned status ${response.statusCode}");
     }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  } catch (e) {
+    print("🔥 Login error: $e");
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
 
   // Sign up user
   Future<bool> signUp(String name, String email, String password) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-      
-      // Simulate API call
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      // For demo purposes, accept any valid data
-      if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
-        _isLoggedIn = true;
-        _userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-        _userEmail = email;
-        
-        await _saveAuthState();
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      }
+  try {
+    _isLoading = true;
+    notifyListeners();
+
+    const String apiUrl = "https://tourapi.dailo.app/api/users/signup/";
+
+    final dio = Dio();
+    final response = await dio.post(
+      apiUrl,
+      data: {
+        "username": name,
+        "email": email,
+        "password": password,
+        "password2": password,
+        "agree_terms": true,
+      },
+      options: Options(
+        headers: {"Content-Type": "application/json"},
+      ),
+    );
+
+    debugPrint("✅ Signup Response Status: ${response.statusCode}");
+    debugPrint("✅ Signup Response Data: ${response.data}");
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      final data = response.data;
+
+      // Mark signup as successful based on HTTP status (no access token expected)
+      _isLoggedIn = true;
+      _userId = data["id"]?.toString();
+      _userEmail = data["email"]?.toString();
+
+      await _saveAuthState();
+
       _isLoading = false;
       notifyListeners();
-      return false;
-    } catch (e) {
-      print('Sign up error: $e');
-      _isLoading = false;
-      notifyListeners();
-      return false;
+      return true;
+    } else {
+      debugPrint("⚠️ Signup failed: Server returned status ${response.statusCode}");
     }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  } catch (e) {
+    if (e is DioException) {
+      debugPrint("🔥 Signup Dio error: ${e.response?.statusCode}");
+      debugPrint("🔥 Signup Dio response data: ${e.response?.data}");
+    } else {
+      debugPrint("🔥 Signup unexpected error: $e");
+    }
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
 
   // Logout user
   Future<void> logout() async {
