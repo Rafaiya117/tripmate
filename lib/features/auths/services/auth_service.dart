@@ -22,6 +22,10 @@ class AuthService extends ChangeNotifier {
 
   String? _token;
   final String _tokenKey = "auth_token";
+
+  String? _otpToken;
+  String? get otpToken => _otpToken;
+
   
 
   AuthService() {
@@ -69,7 +73,50 @@ class AuthService extends ChangeNotifier {
   }
 }
 
+//!---------sent otp----------!
+Future<bool> sendOtp(String email) async {
+  try {
+    _isLoading = true;
+    notifyListeners();
 
+    const String apiUrl = "https://tourapi.dailo.app/api/users/forgot-password/";
+
+    final dio = Dio();
+    final response = await dio.post(
+      apiUrl,
+      data: {"email": email},
+      options: Options(headers: {"Content-Type": "application/json"}),
+    );
+
+    debugPrint("📩 OTP Response Status: ${response.statusCode}");
+    debugPrint("📩 OTP Response Data: ${response.data}");
+
+    if (response.statusCode == 200) {
+      final data = response.data;
+
+      if (data["detail"] != null) {
+        // ✅ Save OTP token from API response
+        _otpToken = data["otp_token"]?.toString();
+        debugPrint("🔑 Saved OTP Token: $_otpToken");
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  } catch (e) {
+    debugPrint("🔥 OTP send error: $e");
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+}
+
+//!---------------------------!
 
   // Login user
   Future<bool> login(String email, String password) async {

@@ -101,6 +101,7 @@ class ResetPasswordPage extends StatelessWidget {
                               final success = await authController.resetPassword(
                                 uiController.newPasswordController.text,
                                 uiController.confirmNewPasswordController.text,
+                                authController.otpToken??"14"
                               );
                               if (success) {
                                 // Navigate to success screen after successful reset

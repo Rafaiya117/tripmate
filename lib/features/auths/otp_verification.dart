@@ -203,23 +203,21 @@ class OTPVerificationPage extends StatelessWidget {
                            ),
                          ),
                        ),
-                     
-                                           // Continue Button
+                      // Continue Button
                       CustomButton(
                         text: authController.isLoading ? "Verifying..." : "Continue",
                         onPressed: authController.isLoading
-                            ? null
-                            : () async {
-                                final otp = uiController.otpControllers
-                                    .map((controller) => controller.text)
-                                    .join();
-                                
-                                final success = await authController.verifyOTP(otp);
+                          ? null
+                          : () async {
+                            final otp = uiController.otpControllers.map((controller) => controller.text).join();
+                            final otp_token = authController.otpToken;
+                              final success = await authController.verifyOTP(otp, "14");
                                 if (success) {
                                   // Navigate to reset password screen
-                                  context.push('/reset_password');
-                                }
-                              },
+                                context.push('/reset_password');
+                                debugPrint(otp_token);
+                            }
+                          },
                         backgroundColor: AppColors.primaryColors,
                         textColor: Colors.white,
                       ),

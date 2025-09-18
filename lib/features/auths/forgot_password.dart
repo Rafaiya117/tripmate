@@ -9,14 +9,15 @@ import 'package:trip_mate/core/common_custom_widget/custom_button.dart';
 import 'package:trip_mate/core/common_custom_widget/custom_input_field.dart';
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
 import 'package:trip_mate/features/auths/controllers/auth_controller.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   const ForgotPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<UIController, AuthController>(
-      builder: (context, uiController, authController, child) {
+    return Consumer3<UIController, AuthController,AuthService>(
+      builder: (context, uiController, authController,authService,child) {
         return Scaffold(
           backgroundColor: AppColors.backgroundColor2,
           appBar: AppBar(
@@ -74,16 +75,21 @@ class ForgotPasswordPage extends StatelessWidget {
                       ),
                     
                     CustomButton(
-                      text: authController.isLoading ? "Sending..." : "Continue",
-                      onPressed: authController.isLoading
+                      text: authService.isLoading ? "Sending..." : "Continue",
+                      onPressed: authService.isLoading
                           ? null
                           : () async {
-                              final success = await authController.forgotPassword(
+                              final success = await authService.sendOtp(
                                 uiController.emailController.text,
                               );
                               if (success) {
-                                // Navigate to OTP screen
                                 context.push('/otp_verification');
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("❌ Failed to send OTP."),
+                                  ),
+                                );
                               }
                             },
                       backgroundColor: AppColors.primaryColors,
