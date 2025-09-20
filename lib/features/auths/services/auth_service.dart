@@ -21,19 +21,22 @@ class AuthService extends ChangeNotifier {
   String? get pendingImagePath => _pendingImagePath;
 
   String? _token;
-  final String _tokenKey = "auth_token";
+  String? get token=>_token;
 
+  final String _tokenKey = "auth_token";
+  String get tokenKey=> _tokenKey;
+  
   String? _otpToken;
   String? get otpToken => _otpToken;
 
   
 
   AuthService() {
-    _loadAuthState();
+    loadAuthState();
   }
 
   // Load authentication state from SharedPreferences
-  Future<void> _loadAuthState() async {
+  Future<void> loadAuthState() async {
   try {
     final prefs = await SharedPreferences.getInstance();
     _isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
@@ -41,6 +44,7 @@ class AuthService extends ChangeNotifier {
     _userEmail = prefs.getString(_userEmailKey);
     _pendingImagePath = prefs.getString(_pendingImagePathKey);
     _token = prefs.getString(_tokenKey); 
+    debugPrint("!================$_token");
     notifyListeners();
   } catch (e) {
     print('Error loading auth state: $e');

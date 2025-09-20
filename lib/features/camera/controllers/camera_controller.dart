@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 
 class TripMateCameraController extends ChangeNotifier {
   CameraController? _cameraController;
@@ -23,7 +25,7 @@ class TripMateCameraController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   XFile? get lastCapturedFile => _lastCapturedFile;
   bool get hasCameras => _cameras.isNotEmpty;
-
+  String? _token;
   // Initialize camera
   Future<void> initializeCamera() async {
     try {
@@ -82,51 +84,99 @@ class TripMateCameraController extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>?> uploadImage(XFile image) async {
+  try {
+    final authService = AuthService();
+    await authService.loadAuthState();
+    _token = authService.token;
+
+    final dio = Dio();
+
+    final formData = FormData.fromMap({
+      "profile_picture": await MultipartFile.fromFile(
+        image.path,
+        filename: image.name,
+      ),
+    });
+
+    final response = await dio.post(
+      "https://tourapi.dailo.app/api/scans/scan/",
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $_token",
+          "Content-Type": "multipart/form-data",
+        },
+        validateStatus: (status) => true, // accept all status codes
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      print("✅ Image uploaded successfully: ${response.data}");
+      return response.data; // return uploaded data
+    } else {
+      // Show exact error from server
+      final errorMessage = response.data?['detail'] ?? 'Upload failed with status ${response.statusCode}';
+      print("❌ Upload failed: $errorMessage");
+      return null;
+    }
+  } catch (e) {
+    print("🚨 Upload exception: $e");
+    return null;
+  }
+}
+
+
+
   // Capture photo
   Future<void> capturePhoto() async {
-    if (!_isInitialized || _cameraController == null) {
-      _errorMessage = 'Camera not initialized';
-      notifyListeners();
-      return;
-    }
+  if (!_isInitialized || _cameraController == null) {
+    _errorMessage = 'Camera not initialized';
+    notifyListeners();
+    return;
+  }
 
-    try {
-      _isCapturing = true;
-      notifyListeners();
+  try {
+    _isCapturing = true;
+    notifyListeners();
 
-      final XFile image = await _cameraController!.takePicture();
+    final XFile image = await _cameraController!.takePicture();
+    _lastCapturedFile = image;
+    _lastCapturedImage = image.path;
+    _errorMessage = null;
+    notifyListeners();
+
+    print('📸 Photo captured: $_lastCapturedImage');
+
+    // 🔥 Upload to API
+    await uploadImage(image);
+
+  } catch (e) {
+    _isCapturing = false;
+    _errorMessage = 'Failed to capture photo: ${e.toString()}';
+    notifyListeners();
+  }
+}
+
+Future<void> openGallery() async {
+  try {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
       _lastCapturedFile = image;
       _lastCapturedImage = image.path;
-      _errorMessage = null;
       notifyListeners();
-      
-      print('Photo captured: $_lastCapturedImage');
-      // Keep isCapturing true for analyzing period
-      // The timer will handle stopping the analyzing state
-    } catch (e) {
-      _isCapturing = false;
-      _errorMessage = 'Failed to capture photo: ${e.toString()}';
-      notifyListeners();
-    }
-  }
+      print('🖼 Image selected from gallery: ${image.path}');
 
-  // Open gallery
-  Future<void> openGallery() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-      
-      if (image != null) {
-        _lastCapturedFile = image;
-        _lastCapturedImage = image.path;
-        notifyListeners();
-        print('Image selected from gallery: ${image.path}');
-      }
-    } catch (e) {
-      _errorMessage = 'Failed to open gallery: ${e.toString()}';
-      notifyListeners();
+      // 🔥 Upload to API
+      await uploadImage(image);
     }
+  } catch (e) {
+    _errorMessage = 'Failed to open gallery: ${e.toString()}';
+    notifyListeners();
   }
+}
 
   // Open recent photos
   void openRecent() {

@@ -22,100 +22,141 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, ProfileController controller) {
-    if (controller.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+  // Widget _buildBody(BuildContext context, ProfileController controller) {
+  //   if (controller.isLoading) {
+  //     return const Center(
+  //       child: CircularProgressIndicator(),
+  //     );
+  //   }
 
-    if (controller.errorMessage != null) {
-      return Center(
+  //   if (controller.errorMessage != null) {
+  //     return Center(
+  //       child: Column(
+  //         mainAxisAlignment: MainAxisAlignment.center,
+  //         children: [
+  //           Icon(
+  //             Icons.error_outline,
+  //             size: 48.sp,
+  //             color: AppColors.disabled1,
+  //           ),
+  //           SizedBox(height: 16.h),
+  //           Text(
+  //             controller.errorMessage!,
+  //             style: GoogleFonts.inter(
+  //               color: AppColors.disabled1,
+  //               fontSize: 16.sp,
+  //             ),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //           SizedBox(height: 16.h),
+  //           ElevatedButton(
+  //             onPressed: controller.refreshProfile,
+  //             child: Text('Retry'),
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
+
+  //   final profile = controller.profile;
+  //   if (profile == null) {
+  //     return const Center(
+  //       child: CircularProgressIndicator(),
+  //     );
+  //   }
+
+  //   return SafeArea(
+  //     child: SingleChildScrollView(
+  //       child: Padding(
+  //         padding: EdgeInsets.symmetric(horizontal: 12.w),
+  //         child: Column(
+  //           children: [
+  //             // App Bar
+  //             _buildAppBar(context),
+              
+  //             SizedBox(height: 40.h),
+              
+  //             // Profile Image Section
+  //             _buildProfileImageSection(profile),
+              
+  //             SizedBox(height: 8.h),
+              
+  //             // Boosted Badge
+  //             if (profile.isBoosted) _buildBoostedBadge(),
+              
+  //             SizedBox(height: 10.h),
+              
+  //             // User Info
+  //             _buildUserInfo(profile),
+              
+  //             SizedBox(height: 10.h),
+              
+  //             // Separator
+  //             _buildSeparator(),
+              
+  //             SizedBox(height: 10.h),
+              
+  //             // Time Remaining Section
+  //             _buildTimeRemainingSection(profile),
+              
+  //             SizedBox(height: 20.h),
+              
+  //             // Separator
+  //             _buildSeparator(),
+              
+  //             SizedBox(height: 20.h),
+              
+  //             // Settings Menu
+  //             _buildSettingsMenu(context, controller),
+              
+  //             SizedBox(height: 20.h),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildBody(BuildContext context, ProfileController controller) {
+  if (controller.isLoading) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  final profile = controller.profile;
+  if (profile == null) {
+    // This should never happen, but fallback
+    return const Center(child: Text("No profile available"));
+  }
+
+  return SafeArea(
+    child: SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12.w),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 48.sp,
-              color: AppColors.disabled1,
-            ),
-            SizedBox(height: 16.h),
-            Text(
-              controller.errorMessage!,
-              style: GoogleFonts.inter(
-                color: AppColors.disabled1,
-                fontSize: 16.sp,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 16.h),
-            ElevatedButton(
-              onPressed: controller.refreshProfile,
-              child: Text('Retry'),
-            ),
+            _buildAppBar(context),
+            SizedBox(height: 40.h),
+            _buildProfileImageSection(profile),
+            SizedBox(height: 8.h),
+            if (profile.isBoosted) _buildBoostedBadge(),
+            SizedBox(height: 10.h),
+            _buildUserInfo(profile),
+            SizedBox(height: 10.h),
+            _buildSeparator(),
+            SizedBox(height: 10.h),
+            _buildTimeRemainingSection(profile),
+            SizedBox(height: 20.h),
+            _buildSeparator(),
+            SizedBox(height: 20.h),
+            _buildSettingsMenu(context, controller),
+            SizedBox(height: 20.h),
           ],
         ),
-      );
-    }
-
-    final profile = controller.profile;
-    if (profile == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
-          child: Column(
-            children: [
-              // App Bar
-              _buildAppBar(context),
-              
-              SizedBox(height: 40.h),
-              
-              // Profile Image Section
-              _buildProfileImageSection(profile),
-              
-              SizedBox(height: 8.h),
-              
-              // Boosted Badge
-              if (profile.isBoosted) _buildBoostedBadge(),
-              
-              SizedBox(height: 10.h),
-              
-              // User Info
-              _buildUserInfo(profile),
-              
-              SizedBox(height: 10.h),
-              
-              // Separator
-              _buildSeparator(),
-              
-              SizedBox(height: 10.h),
-              
-              // Time Remaining Section
-              _buildTimeRemainingSection(profile),
-              
-              SizedBox(height: 20.h),
-              
-              // Separator
-              _buildSeparator(),
-              
-              SizedBox(height: 20.h),
-              
-              // Settings Menu
-              _buildSettingsMenu(context, controller),
-              
-              SizedBox(height: 20.h),
-            ],
-          ),
-        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildAppBar(BuildContext context) {
     return Container(

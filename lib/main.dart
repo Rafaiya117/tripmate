@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,13 +9,15 @@ import 'package:trip_mate/config/connectivity/no_connectivity.dart';
 import 'package:trip_mate/features/splash/splash.dart';
 import 'package:trip_mate/features/auths/controllers/auth_controller.dart';
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
-import 'package:trip_mate/features/splash/controllers/animation_controller.dart';
 import 'package:trip_mate/features/camera/camera.dart';
 import 'package:trip_mate/features/history/history.dart';
 import 'package:trip_mate/features/profile/profile.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
+import 'package:trip_mate/firebase_options.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 

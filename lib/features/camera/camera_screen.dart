@@ -242,67 +242,90 @@ class _CameraScreenState extends State<CameraScreen>
                 top: 4.w,
                 child: GestureDetector(
                   onTap: cameraController.isCapturing
-                      ? null
-                      : () async {
-                          // Check if user is authenticated
-                          if (!authService.isAuthenticated()) {
-                            // Capture photo first
-                            await cameraController.capturePhoto();
-                            if (cameraController.lastCapturedImage != null) {
-                              // Store the captured image path for after login
-                              await authService.setPendingImagePath(
-                                cameraController.lastCapturedImage!,
-                              );
-                              // Reset camera state
-                              cameraController.resetCameraState();
-                              // Show login screen
-                              context.push('/login_page');
-                            }
-                            return;
-                          }
-
-                          await cameraController.capturePhoto();
-                          if (cameraController.lastCapturedImage != null) {
-                            // Navigate to image view screen with the captured image
-                            context.push(
-                              '/image_view?imagePath=${Uri.encodeComponent(cameraController.lastCapturedImage!)}',
-                            );
-                            // Reset camera state after navigation
-                            cameraController.resetCameraState();
-                          }
-                        },
-                  child: Container(
-                    width: 56.w,
-                    height: 56.w,
-                    decoration: ShapeDecoration(
-                      color: cameraController.isCapturing
-                          ? Colors.grey
-                          : Colors.white,
-                      shape: const OvalBorder(),
+                    ? null: () async {
+                      try {
+                      // 1️⃣ Check if user is authenticated
+                      if (!authService.isAuthenticated()) {
+                      // Capture photo first
+                      await cameraController.capturePhoto();
+                      if (cameraController.lastCapturedImage != null) {
+                      // Store the captured image path for after login
+                      await authService.setPendingImagePath(
+                        cameraController.lastCapturedImage!,);
+                        // Reset camera state
+                        cameraController.resetCameraState();
+                        // Navigate to login page
+                        context.push('/login_page');
+                      }
+                      return;
+                    }
+                    // 2️⃣ Capture photo
+                    await cameraController.capturePhoto();
+                      if (cameraController.lastCapturedImage != null) {
+                      // 3️⃣ Upload image
+                      final uploadedData = await cameraController.uploadImage(
+                        cameraController.lastCapturedFile!,);
+                        // 4️⃣ Handle upload response
+                        if (uploadedData != null &&
+                          uploadedData['id'] != null) {
+                          final uploadedId = uploadedData['id'];
+                        // Navigate to image view page using the returned ID
+                          context.push('/image_view?id=$uploadedId');
+                        } else {
+                        // Show exact server message if upload failed
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "❌ Upload failed: Free scans limit reached or missing ID",
+                            ),
+                          ),
+                        );
+                        print('❌ Upload failed or missing ID');
+                      }
+                      // 5️⃣ Reset camera state after upload
+                      cameraController.resetCameraState();
+                    }
+                  } catch (e) {
+                  // Catch any unexpected errors
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("🚨 Error: ${e.toString()}"),
                     ),
-                    child: cameraController.isCapturing
-                        ? Center(
-                            child: SizedBox(
-                              width: 20.w,
-                              height: 20.w,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.w,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                  );
+                  cameraController.resetCameraState();
+                }
+              },
+              child: Container(
+                width: 56.w,
+                height: 56.w,
+                decoration: ShapeDecoration(
+                  color: cameraController.isCapturing
+                  ? Colors.grey
+                  : Colors.white,
+                  shape: const OvalBorder(),
+                ),
+                child: cameraController.isCapturing
+                  ? Center(
+                    child: SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.w,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.white,
                                 ),
                               ),
                             ),
                           )
                         : null,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
-
-        // Recent Button
-        Container(
+            ),
+          // Recent Button
+          Container(
           width: 30.w,
           height: 30.w,
           decoration: BoxDecoration(

@@ -11,6 +11,7 @@ import 'package:trip_mate/core/common_custom_widget/custom_language_dropdown.dar
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
 import 'package:trip_mate/features/auths/controllers/auth_controller.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
+import 'package:trip_mate/features/auths/services/google_auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -297,7 +298,28 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 20.h),
                     CustomButton(
                       text: "Google",
-                      onPressed: () {},
+                      onPressed: () async{
+                        try {
+                          final userCredential = await GoogleSignInService.signInWithGoogle();
+                            if (userCredential != null) {
+                              print("Signed in as: ${userCredential.user?.displayName}",);
+                                if (context.mounted) {
+                                  //context.push('/sign_up',); 
+                                  if (authService.pendingImagePath != null) {
+                                  // Navigate to image view screen with the pending image
+                                  final imagePath = authService.pendingImagePath!;
+                                  await authService.clearPendingImagePath(); // Clear the pending path
+                                  context.go('/image_view?imagePath=${Uri.encodeComponent(imagePath)}');
+                                } else {
+                                  // Navigate to camera screen if no pending image
+                                  context.go('/camera');
+                                }
+                              }
+                            }
+                          } catch (e) {
+                          print("Google Sign-In failed: $e");
+                        }
+                      },
                       backgroundColor: AppColors.backgroundColor2,
                       textColor: Colors.black,
                       iconPath: AppAssets.googleIcon,

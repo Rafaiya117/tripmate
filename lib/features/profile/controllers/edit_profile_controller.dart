@@ -1,8 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:trip_mate/config/colors/colors.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:trip_mate/features/profile/models/edit_profile_model.dart';
 
 class EditProfileController extends ChangeNotifier {
@@ -36,35 +36,63 @@ class EditProfileController extends ChangeNotifier {
   bool get isNewPasswordVisible => _isNewPasswordVisible;
   File? get selectedImage => _selectedImage;
   String get currentImageUrl => _currentImageUrl;
+  String? _token;
 
   EditProfileController() {
     _loadInitialData();
   }
 
   // Load initial data from profile
-  Future<void> _loadInitialData() async {
+   Future<void> _loadInitialData() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Simulate API call delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Set initial values (in real app, this would come from API)
-      fullNameController.text = 'Arif Hossain';
-      emailController.text = 'example@mail.com';
-      oldPasswordController.text = '**********';
-      newPasswordController.text = '**********';
-      
-      _isLoading = false;
-      notifyListeners();
+      final authService = AuthService();
+      await authService.loadAuthState();
+      _token = authService.token;
+
+      final dio = Dio();
+
+      final response = await dio.get(
+        "https://tourapi.dailo.app/api/users/me/", 
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $_token",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        // Fill text fields
+        fullNameController.text = data['username'] ?? '';
+        emailController.text = data['email'] ?? '';
+        oldPasswordController.text = '';
+        newPasswordController.text = '';
+
+        // Preload profile image
+        if (data['profile_picture'] != null &&
+            data['profile_picture'].toString().isNotEmpty) {
+          _currentImageUrl = data['profile_picture'];
+        } else {
+          _currentImageUrl ='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face';
+        }
+        _isLoading = false;
+        notifyListeners();
+      } else {
+        _errorMessage = "Failed to load profile (${response.statusCode})";
+        _isLoading = false;
+        notifyListeners();
+      }
     } catch (e) {
-      _errorMessage = 'Failed to load profile data';
+      _errorMessage = "Error loading profile: $e";
       _isLoading = false;
       notifyListeners();
     }
   }
-
   // Pick image from gallery
   Future<void> pickImageFromGallery() async {
     try {
@@ -113,42 +141,66 @@ class EditProfileController extends ChangeNotifier {
 
   // Save profile changes
   Future<bool> saveProfile() async {
-    if (!validateForm()) {
-      return false;
-    }
-
-    _isSaving = true;
-    _errorMessage = null;
-    _successMessage = null;
-    notifyListeners();
-
-    try {
-      // Simulate API call delay
-      await Future.delayed(const Duration(milliseconds: 1500));
-      
-      // Create updated profile model
-      final updatedProfile = EditProfileModel(
-        fullName: fullNameController.text.trim(),
-        email: emailController.text.trim(),
-        oldPassword: oldPasswordController.text,
-        newPassword: newPasswordController.text,
-      );
-
-      // In real app, this would be an API call
-      // await profileService.updateProfile(updatedProfile);
-      
-      _successMessage = 'Profile updated successfully!';
-      _isSaving = false;
-      notifyListeners();
-      
-      return true;
-    } catch (e) {
-      _errorMessage = 'Failed to update profile. Please try again.';
-      _isSaving = false;
-      notifyListeners();
-      return false;
-    }
+  if (!validateForm()) {
+    return false;
   }
+
+  _isSaving = true;
+  _errorMessage = null;
+  _successMessage = null;
+  notifyListeners();
+
+  try {
+    final authService = AuthService();
+    await authService.loadAuthState();
+    _token = authService.token;
+
+    final dio = Dio();
+
+    // Prepare FormData
+    final formData = FormData.fromMap({
+      "username": fullNameController.text.trim(),
+      "email": emailController.text.trim(),
+      // if (oldPasswordController.text.isNotEmpty)
+      //   "old_password": oldPasswordController.text,
+      // if (newPasswordController.text.isNotEmpty)
+      //   "new_password": newPasswordController.text,
+      // if (_selectedImage != null)
+      //   "profile_picture": await MultipartFile.fromFile(
+      //     _selectedImage!.path,
+      //     filename: _selectedImage!.path.split('/').last,
+      //   ),
+    });
+
+    final response = await dio.patch(
+      "https://tourapi.dailo.app/api/users/edit-profile/",
+      data: formData,
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $_token",
+          "Content-Type": "multipart/form-data",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      _successMessage = "Profile updated successfully!";
+      _isSaving = false;
+      notifyListeners();
+      return true;
+    } else {
+      _errorMessage = "Failed to update profile (${response.statusCode})";
+      _isSaving = false;
+      notifyListeners();
+      return false;
+    }
+  } catch (e) {
+    _errorMessage = "Error updating profile: $e";
+    _isSaving = false;
+    notifyListeners();
+    return false;
+  }
+}
 
   // Clear messages
   void clearError() {
