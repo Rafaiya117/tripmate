@@ -112,13 +112,18 @@ class HistoryCard extends StatelessWidget {
                           color: AppColors.iconColor,
                         ),
                       SizedBox(width: 4.w),
-                      Text(
-                        history.location!,
-                        style: GoogleFonts.inter(
-                          color: AppColors.iconColor,
-                          //color: Colors.white,
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w400,
+                      SizedBox(
+                        width: 50,
+                        child: Text(
+                          history.location!,
+                          maxLines: 1, 
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: AppColors.iconColor,
+                            //color: Colors.white,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
 

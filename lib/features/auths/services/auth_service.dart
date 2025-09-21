@@ -7,7 +7,8 @@ class AuthService extends ChangeNotifier {
   static const String _userIdKey = 'userId';
   static const String _userEmailKey = 'userEmail';
   static const String _pendingImagePathKey = 'pendingImagePath';
-  
+  static const String _refreshTokenKey = "refresh_token";
+
   bool _isLoggedIn = false;
   bool _isLoading = false;
   String? _userId;
@@ -21,7 +22,9 @@ class AuthService extends ChangeNotifier {
   String? get pendingImagePath => _pendingImagePath;
 
   String? _token;
+   String? _refreshToken; 
   String? get token=>_token;
+  String? get refreshToken => _refreshToken;
 
   final String _tokenKey = "auth_token";
   String get tokenKey=> _tokenKey;
@@ -43,7 +46,8 @@ class AuthService extends ChangeNotifier {
     _userId = prefs.getString(_userIdKey);
     _userEmail = prefs.getString(_userEmailKey);
     _pendingImagePath = prefs.getString(_pendingImagePathKey);
-    _token = prefs.getString(_tokenKey); 
+    _token = prefs.getString(_tokenKey);
+    _refreshToken = prefs.getString(_refreshTokenKey);  
     debugPrint("!================$_token");
     notifyListeners();
   } catch (e) {
@@ -68,10 +72,7 @@ class AuthService extends ChangeNotifier {
     if (_token != null) {
       await prefs.setString(_tokenKey, _token!); 
     }
-    // Optional: save refresh token too
-    // if (refreshToken != null) {
-    //   await prefs.setString("refresh_token", refreshToken);
-    // }
+    if (_refreshToken != null) await prefs.setString(_refreshTokenKey, _refreshToken!);
   } catch (e) {
     print('Error saving auth state: $e');
   }
@@ -156,7 +157,7 @@ Future<bool> sendOtp(String email) async {
 
         // Save both tokens
         _token = data["access"]?.toString();
-        final refreshToken = data["refresh"]?.toString();
+        _refreshToken = data["refresh"]?.toString();
 
         await _saveAuthState();
 
@@ -248,13 +249,46 @@ Future<bool> sendOtp(String email) async {
 
   // Logout user
   Future<void> logout() async {
-    _isLoggedIn = false;
-    _userId = null;
-    _userEmail = null;
-    
-    await _saveAuthState();
-    notifyListeners();
+    try {
+      if (_refreshToken == null) {
+        print("No refresh token available for logout.");
+        return;
+      }
+
+      final dio = Dio();
+      final response = await dio.post(
+        "https://tourapi.dailo.app/api/users/logout/",
+        data: {"refresh": _refreshToken}, 
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+             "Authorization": "Bearer $_token",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print("✅ Server logout success: ${response.data}");
+      } else {
+        print("⚠️ Server logout failed: ${response.data}");
+      }
+    } catch (e) {
+      print("❌ Logout error: $e");
+    } finally {
+      // Clear local auth state regardless
+      _isLoggedIn = false;
+      _userId = null;
+      _userEmail = null;
+      _token = null;
+      _refreshToken = null;
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      notifyListeners();
+    }
   }
+  
 
   // Check if user is authenticated
   bool isAuthenticated() {

@@ -1,0 +1,32 @@
+{
+    "profile_text":"輪廓",
+    "time_remaining":"剩餘時間",
+    "edit_profile":"編輯個人資料",
+    "subscription":"訂閱",
+    "privacy_policy":"隱私權政策",
+    "logout":"退出",
+
+    "edit_profiledata":"編輯個人資料",
+    "tap_to_change":"點按即可變更個人資料圖片",
+    "full_name":"姓名",
+    "email_address":"電子郵件",
+    "current_password":"目前密碼",
+    "new_passowrd":"新密碼",
+    "save_changes":"儲存變更",
+
+    "retry":"重试",
+    "title":"你正在享受",
+    "sub_title":"想要更多？立即升级，即可随时无限访问。",
+    "upgrade_plan":"升级计划",
+    "cancel_subcription":"取消订阅",
+    "upgrade_subcription":"订阅升级成功!",
+    "fail_to_upgrade":"升级订阅失败。请重试。",
+    "delete_subcription":"删除订阅",
+    "confirm_alert":"您确定要删除此订阅吗？",
+    "cancel":"取消",
+    "subscription_canel":"订阅已成功取消。",
+    "cancel_fail":"取消订阅失败。请重试。",
+    "delete":"删除",
+
+    "history":"历史"
+}

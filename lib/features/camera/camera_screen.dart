@@ -1,4 +1,5 @@
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -154,9 +155,22 @@ class _CameraScreenState extends State<CameraScreen>
                         items: ['English', '简体中文', '繁體中文'],
                         selectedValue: uiController.selectedLanguage,
                         hintText: 'Select Language',
+                        // onChanged: (value) {
+                        //   if (value != null) {
+                        //     uiController.setLanguage(value);
+                        //   }
+                        // },
                         onChanged: (value) {
                           if (value != null) {
                             uiController.setLanguage(value);
+
+                            if (value == 'English') {
+                              context.setLocale(const Locale('en', 'US'));
+                            } else if (value == '简体中文') {
+                              context.setLocale(const Locale('zh', 'CN'));
+                            } else if (value == '繁體中文') {
+                              context.setLocale(const Locale('zh', 'TW'));
+                            }
                           }
                         },
                         buttonWidth: 89.w,
@@ -262,30 +276,30 @@ class _CameraScreenState extends State<CameraScreen>
                     // 2️⃣ Capture photo
                     await cameraController.capturePhoto();
                       if (cameraController.lastCapturedImage != null) {
-                      // 3️⃣ Upload image
-                      final uploadedData = await cameraController.uploadImage(
-                        cameraController.lastCapturedFile!,);
-                        // 4️⃣ Handle upload response
-                        if (uploadedData != null &&
-                          uploadedData['id'] != null) {
-                          final uploadedId = uploadedData['id'];
-                        // Navigate to image view page using the returned ID
-                          context.push('/image_view?id=$uploadedId');
-                        } else {
-                        // Show exact server message if upload failed
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "❌ Upload failed: Free scans limit reached or missing ID",
-                            ),
-                          ),
-                        );
-                        print('❌ Upload failed or missing ID');
-                      }
-                      // 5️⃣ Reset camera state after upload
-                      cameraController.resetCameraState();
-                    }
-                  } catch (e) {
+                        final capturedFile = cameraController.lastCapturedFile;
+                          if (capturedFile != null) {
+                             final imagePath = capturedFile.path;
+                              // Pass file path as query parameter
+                                context.go('/image_view?imagePath=${Uri.encodeComponent(imagePath)}',);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("No captured image available",),
+                                  ),
+                                );
+                                print('No captured image available');
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "❌ No captured image available",
+                                  ),
+                                ),
+                              );
+                              print('❌ No captured image available');
+                            }
+                          } catch (e) {
                   // Catch any unexpected errors
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

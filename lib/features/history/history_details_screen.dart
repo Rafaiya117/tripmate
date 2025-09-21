@@ -487,55 +487,101 @@ class HistoryDetailsScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        
         SizedBox(height: 16.h),
-        
         // Metadata Row
-        Row(
-          children: [
-            // Location
-            Row(
-              children: [
-                Icon(
-                  Icons.location_on,
-                  size: 16.sp,
-                  color: AppColors.iconColor,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  details.location,
-                  style: GoogleFonts.inter(
-                    color: AppColors.textColor1,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
+        (details.location.length > 30)
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 16.sp,
+                        color: AppColors.iconColor,
+                      ),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        // prevent overflow
+                        child: Text(
+                          details.location,
+                          style: GoogleFonts.inter(
+                            color: AppColors.textColor1,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          softWrap: true,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            
-            SizedBox(width: 24.w),
-            
-            // Year
-            Row(
-              children: [
-                Icon(
-                  Icons.business,
-                  size: 16.sp,
-                  color: AppColors.iconColor,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  details.year,
-                  style: GoogleFonts.inter(
-                    color: AppColors.textColor1,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
+                  SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.business,
+                        size: 16.sp,
+                        color: AppColors.iconColor,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        details.year,
+                        style: GoogleFonts.inter(
+                          color: AppColors.textColor1,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                ],
+              )
+            : Row(
+                children: [
+                  // Location
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 16.sp,
+                        color: AppColors.iconColor,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        details.location,
+                        style: GoogleFonts.inter(
+                          color: AppColors.textColor1,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: 24.w),
+                  // Year
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.business,
+                        size: 16.sp,
+                        color: AppColors.iconColor,
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        details.year,
+                        style: GoogleFonts.inter(
+                          color: AppColors.textColor1,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
         SizedBox(width: double.infinity,child: Divider(color: AppColors.disabled1, height: 24.h),),
         // SizedBox(height: 24.h),
         SizedBox(height: 10.h,),

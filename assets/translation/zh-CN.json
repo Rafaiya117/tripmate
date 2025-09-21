@@ -1,0 +1,34 @@
+{
+    "profile_text":"剖面",
+    "time_remaining":"剩余时间",
+    "edit_profile":"编辑个人资料",
+    "subscription":"订阅",
+    "privacy_policy":"隐私政策",
+    "logout":"退出",
+
+    "edit_profiledata":"编辑个人资料",
+    "tap_to_change":"点按即可更改个人资料图片",
+    "full_name":"姓名",
+    "email_address":"电子邮件",
+    "current_password":"当前密码",
+    "new_passowrd":"新密码",
+    "save_changes":"保存更改",
+
+    "retry":"重试",
+    "title":"你正在享受",
+    "sub_title":"想要更多？立即升级，即可随时无限访问。",
+    "upgrade_plan":"升级计划",
+    "cancel_subcription":"取消订阅",
+    "upgrade_subcription":"订阅升级成功!",
+    "fail_to_upgrade":"升级订阅失败。请重试。",
+    "delete_subcription":"删除订阅",
+    "confirm_alert":"您确定要删除此订阅吗？",
+    "cancel":"取消",
+    "subscription_canel":"订阅已成功取消。",
+    "cancel_fail":"取消订阅失败。请重试。",
+    "delete":"删除",
+
+    "history":"历史"
+
+   
+}

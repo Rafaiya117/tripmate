@@ -84,50 +84,6 @@ class TripMateCameraController extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>?> uploadImage(XFile image) async {
-  try {
-    final authService = AuthService();
-    await authService.loadAuthState();
-    _token = authService.token;
-
-    final dio = Dio();
-
-    final formData = FormData.fromMap({
-      "profile_picture": await MultipartFile.fromFile(
-        image.path,
-        filename: image.name,
-      ),
-    });
-
-    final response = await dio.post(
-      "https://tourapi.dailo.app/api/scans/scan/",
-      data: formData,
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $_token",
-          "Content-Type": "multipart/form-data",
-        },
-        validateStatus: (status) => true, // accept all status codes
-      ),
-    );
-
-    if (response.statusCode == 200) {
-      print("✅ Image uploaded successfully: ${response.data}");
-      return response.data; // return uploaded data
-    } else {
-      // Show exact error from server
-      final errorMessage = response.data?['detail'] ?? 'Upload failed with status ${response.statusCode}';
-      print("❌ Upload failed: $errorMessage");
-      return null;
-    }
-  } catch (e) {
-    print("🚨 Upload exception: $e");
-    return null;
-  }
-}
-
-
-
   // Capture photo
   Future<void> capturePhoto() async {
   if (!_isInitialized || _cameraController == null) {
@@ -148,9 +104,6 @@ class TripMateCameraController extends ChangeNotifier {
 
     print('📸 Photo captured: $_lastCapturedImage');
 
-    // 🔥 Upload to API
-    await uploadImage(image);
-
   } catch (e) {
     _isCapturing = false;
     _errorMessage = 'Failed to capture photo: ${e.toString()}';
@@ -168,9 +121,6 @@ Future<void> openGallery() async {
       _lastCapturedImage = image.path;
       notifyListeners();
       print('🖼 Image selected from gallery: ${image.path}');
-
-      // 🔥 Upload to API
-      await uploadImage(image);
     }
   } catch (e) {
     _errorMessage = 'Failed to open gallery: ${e.toString()}';

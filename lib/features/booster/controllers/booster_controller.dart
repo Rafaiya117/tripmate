@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:trip_mate/features/booster/models/booster_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BoosterController extends ChangeNotifier {
   List<BoosterModel> _boosters = [];
@@ -12,7 +15,7 @@ class BoosterController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get selectedBoosterId => _selectedBoosterId;
-
+  String? _token;
   BoosterController() {
     _loadBoosters();
   }
@@ -89,20 +92,45 @@ class BoosterController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> purchaseBooster(String boosterId) async {
+  Future<bool> purchaseBooster(String duration) async {
     try {
       _isLoading = true;
       notifyListeners();
+      final authService = AuthService();
+      await authService.loadAuthState();
+      _token = authService.token;
 
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
+      final dio = Dio();
+      final response = await dio.post(
+        "https://tourapi.dailo.app/api/payments/create-checkout-session/", 
+        data: {"duration": duration},
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $_token",
+          },
+        ),
+      );
 
-      // Mock successful purchase
-      _isLoading = false;
-      notifyListeners();
-      return true;
+      if (response.statusCode == 200 && response.data["checkout_url"] != null) {
+        final checkoutUrl = response.data["checkout_url"];
+
+        if (await canLaunchUrl(Uri.parse(checkoutUrl))) {
+          await launchUrl(Uri.parse(checkoutUrl),
+            mode: LaunchMode.externalApplication);
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = "Invalid response from server";
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
-      _errorMessage = 'Failed to purchase booster: ${e.toString()}';
+      _errorMessage = 'Failed to purchase booster: $e';
       _isLoading = false;
       notifyListeners();
       return false;

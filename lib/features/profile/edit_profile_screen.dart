@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,7 +46,7 @@ class EditProfileScreen extends StatelessWidget {
                 SizedBox(height: 40.h),
                 
                 // Form Fields
-                _buildFormFields(controller),
+                _buildFormFields(context,controller),
                 
                 SizedBox(height: 40.h),
                 
@@ -96,7 +97,7 @@ class EditProfileScreen extends StatelessWidget {
           // Title
           Expanded(
             child: Text(
-              'Edit Profile',
+              context.tr('edit_profiledata'),
               style: GoogleFonts.inter(
                 color: AppColors.textColor1,
                 fontSize: 24.sp,
@@ -190,7 +191,7 @@ class EditProfileScreen extends StatelessWidget {
         
         // Profile Image Text
         Text(
-          'Tap to change profile picture',
+          context.tr('tap_to_change'),
           style: GoogleFonts.inter(
             color: Colors.grey.shade600,
             fontSize: 14.sp,
@@ -213,12 +214,12 @@ class EditProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFormFields(EditProfileController controller) {
+  Widget _buildFormFields(BuildContext context,EditProfileController controller) {
     return Column(
       children: [
         // Full Name Field
         CustomTextField(
-          label: 'Full Name',
+          label: context.tr('full_name'),
           controller: controller.fullNameController,
           isRequired: true,
           validator: (value) {
@@ -234,7 +235,7 @@ class EditProfileScreen extends StatelessWidget {
         
         // Email Field
         CustomTextField(
-          label: 'Email Address',
+          label: context.tr('email_address'),
           controller: controller.emailController,
           isRequired: true,
           validator: (value) {
@@ -254,7 +255,7 @@ class EditProfileScreen extends StatelessWidget {
         
         // Old Password Field
         CustomTextField(
-          label: 'Current Password',
+          label: context.tr('current_password'),
           controller: controller.oldPasswordController,
           isPassword: true,
           isVisible: controller.isOldPasswordVisible,
@@ -272,7 +273,7 @@ class EditProfileScreen extends StatelessWidget {
         
         // New Password Field
         CustomTextField(
-          label: 'New Password',
+          label: context.tr('new_passowrd'),
           controller: controller.newPasswordController,
           isPassword: true,
           isVisible: controller.isNewPasswordVisible,
@@ -339,7 +340,7 @@ class EditProfileScreen extends StatelessWidget {
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        'Save Changes',
+                        context.tr('save_changes'),
                         style: GoogleFonts.inter(
                           color: Colors.white,
                           fontSize: 18.sp,

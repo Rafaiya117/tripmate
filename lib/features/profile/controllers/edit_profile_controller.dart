@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
-import 'package:trip_mate/features/profile/models/edit_profile_model.dart';
 
 class EditProfileController extends ChangeNotifier {
   final TextEditingController fullNameController = TextEditingController();

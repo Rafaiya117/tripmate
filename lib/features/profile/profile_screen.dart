@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -144,7 +145,7 @@ class ProfileScreen extends StatelessWidget {
             SizedBox(height: 10.h),
             _buildSeparator(),
             SizedBox(height: 10.h),
-            _buildTimeRemainingSection(profile),
+            _buildTimeRemainingSection(context,profile),
             SizedBox(height: 20.h),
             _buildSeparator(),
             SizedBox(height: 20.h),
@@ -187,7 +188,7 @@ class ProfileScreen extends StatelessWidget {
           // Title
           Expanded(
             child: Text(
-              'Profile',
+              context.tr('profile_text'),
               style: GoogleFonts.inter(
                 color: AppColors.textColor1,
                 fontSize: 22.sp,
@@ -287,12 +288,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeRemainingSection(profile) {
+  Widget _buildTimeRemainingSection(BuildContext context,profile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Time remaining',
+          context.tr('time_remaining'),
           style: GoogleFonts.inter(
             color: AppColors.textColor1,
             fontSize: 22.sp,
@@ -360,7 +361,7 @@ class ProfileScreen extends StatelessWidget {
         children: [
           ProfileMenuItem(
             icon: Icons.border_color,
-            title: 'Edit profile',
+            title: context.tr('edit_profile'),
             onTap: () {
               // Navigate to edit profile screen
               context.push('/edit_profile');
@@ -368,7 +369,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           ProfileMenuItem(
             icon: Icons.card_membership,
-            title: 'Subscription',
+            title: context.tr('subscription'),
             onTap: () {
               // Navigate to subscription screen
               context.push('/subscription');
@@ -376,7 +377,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           ProfileMenuItem(
             icon: Icons.security,
-            title: 'Privacy & Policy',
+            title: context.tr('privacy_policy'),
             onTap: () {
               // Navigate to privacy policy screen
               context.push('/privacy_policy');
@@ -384,7 +385,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           ProfileMenuItem(
             icon: Icons.logout,
-            title: 'Log out',
+            title: context.tr('logout'),
             showDivider: false,
             onTap: () {
               _showLogoutDialog(context, controller);
@@ -441,7 +442,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                                 TextButton(
+                TextButton(
                    onPressed: controller.isLoading ? null : () async {
                      setState(() {
                        // Show loading state in dialog

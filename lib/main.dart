@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,7 +19,15 @@ import 'package:trip_mate/firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  await EasyLocalization.ensureInitialized();
+  runApp(
+    EasyLocalization(
+      supportedLocales: [Locale('en','US'),Locale('zh','CN'), Locale('zh','TW')],
+      path: 'assets/translation',
+      fallbackLocale: Locale('en','US'),
+      child: MyApp(),
+    )
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -73,6 +82,9 @@ class _MyAppState extends State<MyApp>{
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'TripMate',
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
           theme: ThemeData(
             textTheme: GoogleFonts.interTextTheme(),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

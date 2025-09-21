@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,7 +51,7 @@ class SubscriptionScreen extends StatelessWidget {
             SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: controller.refreshSubscription,
-              child: Text('Retry'),
+              child: Text(context.tr('retry')),
             ),
           ],
         ),
@@ -108,7 +109,7 @@ class SubscriptionScreen extends StatelessWidget {
           // Title
           Expanded(
             child: Text(
-              'Subscription',
+              context.tr('subscription'),
               style: GoogleFonts.inter(
                 color: AppColors.textColor1,
                 fontSize: 22.sp,
@@ -135,7 +136,7 @@ class SubscriptionScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Text(
-              'You\'re enjoying the ${subscription.planName}.',
+              context.tr('title ${subscription.planName}.'),
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 color: AppColors.textColor1,
@@ -153,7 +154,7 @@ class SubscriptionScreen extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Text(
-              'Want more? Upgrade now for unlimited access anytime.',
+              context.tr('sub_title'),
               style: GoogleFonts.inter(
                 color: AppColors.textColor1,
                 fontSize: 12.sp,
@@ -168,7 +169,7 @@ class SubscriptionScreen extends StatelessWidget {
           
           // Upgrade Button
           SubscriptionButton(
-            text: 'Upgrade plan',
+            text: context.tr('upgrade_plan'),
             onPressed: subscription.canUpgrade 
               ? () => _handleUpgrade(context, controller)
               : null,
@@ -180,7 +181,7 @@ class SubscriptionScreen extends StatelessWidget {
           
           // Cancel Button
           SubscriptionButton(
-            text: 'Cancel subscription',
+            text: context.tr('cancel_subcription'),
             onPressed: subscription.canCancel 
               ? () => _handleCancel(context, controller)
               : null,
@@ -199,7 +200,7 @@ class SubscriptionScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Subscription upgraded successfully!'),
+            content: Text(context.tr('upgrade_subcription')),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
@@ -209,7 +210,7 @@ class SubscriptionScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to upgrade subscription. Please try again.'),
+            content: Text(context.tr('fail_to_upgrade')),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -271,7 +272,7 @@ class SubscriptionScreen extends StatelessWidget {
                        SizedBox(width: 12.w),
                        Expanded(
                          child: Text(
-                           'Delete subscription',
+                           context.tr('delete_subcription'),
                            style: GoogleFonts.inter(
                              color: AppColors.textColor1,
                              fontSize: 18.sp,
@@ -289,7 +290,7 @@ class SubscriptionScreen extends StatelessWidget {
                      padding: EdgeInsets.all(16.w),
                      child: Center(
                        child: Text(
-                         'Are you sure you want to delete this subscription?',
+                         context.tr('confirm_alert'),
                          style: GoogleFonts.inter(
                            color: AppColors.labelTextColor,
                            fontSize: 16.sp,
@@ -327,7 +328,7 @@ class SubscriptionScreen extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'Cancel',
+                              context.tr('cancel'),
                               style: GoogleFonts.inter(
                                 color: AppColors.textColor1,
                                 fontSize: 16.sp,
@@ -355,7 +356,7 @@ class SubscriptionScreen extends StatelessWidget {
                               if (success && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Subscription cancelled successfully.'),
+                                    content: Text(context.tr('subscription_canel')),
                                     backgroundColor: Colors.green,
                                     duration: const Duration(seconds: 3),
                                   ),
@@ -363,7 +364,7 @@ class SubscriptionScreen extends StatelessWidget {
                               } else if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('Failed to cancel subscription. Please try again.'),
+                                    content: Text(context.tr('cancel_fail')),
                                     backgroundColor: Colors.red,
                                     duration: const Duration(seconds: 3),
                                   ),
@@ -377,7 +378,7 @@ class SubscriptionScreen extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'Delete',
+                              context.tr('delete'),
                               style: GoogleFonts.inter(
                                 color: Colors.white,
                                 fontSize: 16.sp,
