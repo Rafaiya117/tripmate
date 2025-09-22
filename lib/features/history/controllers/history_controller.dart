@@ -99,7 +99,7 @@ class HistoryController extends ChangeNotifier {
     
     final dio = Dio();
     final response = await dio.get(
-      "https://tourapi.dailo.app/api/scans/scan/history/", 
+      "https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/history/", 
       options: Options(
         headers: {
           "Authorization": "Bearer $_token",

@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:trip_mate/config/app_route/router.dart';
 import 'package:trip_mate/config/connectivity/no_connectivity.dart';
+import 'package:trip_mate/features/camera/controllers/scan_controller.dart';
 import 'package:trip_mate/features/splash/splash.dart';
 import 'package:trip_mate/features/auths/controllers/auth_controller.dart';
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
@@ -78,6 +79,7 @@ class _MyAppState extends State<MyApp>{
           ChangeNotifierProvider(create: (_) => PrivacyPolicyController()),
           ChangeNotifierProvider(create: (_) => SubscriptionController()),
           ChangeNotifierProvider(create: (_) => AuthService()),
+          ChangeNotifierProvider(create: (_) => ScanController()),
         ],
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,

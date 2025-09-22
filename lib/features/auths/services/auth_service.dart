@@ -84,7 +84,7 @@ Future<bool> sendOtp(String email) async {
     _isLoading = true;
     notifyListeners();
 
-    const String apiUrl = "https://tourapi.dailo.app/api/users/forgot-password/";
+    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/forgot-password/";
 
     final dio = Dio();
     final response = await dio.post(
@@ -130,7 +130,7 @@ Future<bool> sendOtp(String email) async {
     notifyListeners();
     debugPrint("!---------Attempting login with email: $email");
 
-    const String apiUrl = "https://tourapi.dailo.app/api/users/login/";
+    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/login/";
 
     final dio = Dio();
     final response = await dio.post(
@@ -194,7 +194,7 @@ Future<bool> sendOtp(String email) async {
     _isLoading = true;
     notifyListeners();
 
-    const String apiUrl = "https://tourapi.dailo.app/api/users/signup/";
+    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/signup/";
 
     final dio = Dio();
     final response = await dio.post(
@@ -257,7 +257,7 @@ Future<bool> sendOtp(String email) async {
 
       final dio = Dio();
       final response = await dio.post(
-        "https://tourapi.dailo.app/api/users/logout/",
+        "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/logout/",
         data: {"refresh": _refreshToken}, 
         options: Options(
           headers: {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
@@ -143,22 +145,31 @@ class HistoryDetailsController extends ChangeNotifier {
 
 Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
   try {
-    final String apiUrl = 'https://tourapi.dailo.app/api/scans/scan/$id';
-
+    final String apiUrl = 'https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/59';
     final dio = Dio();
 
     dio.options.headers = {
       'Authorization': 'Bearer $_token',
-      'Accept': 'application/json', 
+      'Accept': 'application/json',
     };
 
-    final response = await dio.get(apiUrl);
+    final response = await dio.get(
+      apiUrl,
+      options: Options(
+        validateStatus: (status) => status != null && status < 500,
+      ),
+    );
 
     if (response.statusCode == 200) {
       final data = response.data;
-
       final scan = data['scan'];
-      final analysis = data['analysis'];
+
+      Map<String, dynamic> analysis = {};
+      if (data['analysis'] != null) {
+        analysis = data['analysis'];
+      } else if (scan['result_text'] != null) {
+        analysis = jsonDecode(scan['result_text']);
+      }
 
       return HistoryDetailsModel(
         id: scan['id'].toString(),
@@ -173,7 +184,6 @@ Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
         additionalInfo: analysis['cultural_impact'] ?? 'Additional info not available.',
       );
     } else if (response.statusCode == 401) {
-      // Unauthorized
       print('Unauthorized: Check your API token');
       return HistoryDetailsModel(
         id: id,
@@ -188,7 +198,6 @@ Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
         additionalInfo: 'N/A',
       );
     } else {
-      // Other errors
       return HistoryDetailsModel(
         id: id,
         title: 'Error',

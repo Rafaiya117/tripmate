@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:trip_mate/config/colors/colors.dart';
+import 'package:trip_mate/features/camera/controllers/camera_controller.dart';
+import 'package:trip_mate/features/camera/controllers/scan_controller.dart';
 import 'package:trip_mate/features/history/controllers/history_details_controller.dart';
 import 'package:trip_mate/features/history/widgets/rich_text_widget.dart';
 
@@ -27,7 +29,6 @@ class HistoryDetailsScreen extends StatelessWidget {
             controller.loadHistoryDetails(historyId);
           }
         });
-        
         return Scaffold(
           backgroundColor: AppColors.backgroundColor1,
           body: _buildBody(context, controller),
@@ -64,35 +65,54 @@ class HistoryDetailsScreen extends StatelessWidget {
             ),
             // No delete action for captured images
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: FileImage(File(capturedImagePath!)),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        // ignore: deprecated_member_use
-                        Colors.black.withOpacity(0.3),
-                      ],
+              background: Consumer<TripMateCameraController>(
+                builder: (context, cameraController, child) {
+                  final capturedImagePath = cameraController.lastCapturedFile?.path;
+                  return Container(
+                    decoration: BoxDecoration(
+                      image: capturedImagePath != null
+                        ? DecorationImage(
+                          image: FileImage(File(capturedImagePath)),
+                          fit: BoxFit.cover,
+                        )
+                          : null,
                     ),
-                  ),
-                ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withOpacity(0.3),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
 
           // Content for captured image
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: EdgeInsets.all(16.w),
+          //     child: _buildCapturedImageContent(),
+          //   ),
+          // ),
+
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(16.w),
-              child: _buildCapturedImageContent(),
+              child: Consumer<ScanController>(
+                builder: (context, controller, child) {
+                  final analysis = controller.lastScanResult?["analysis"] ?? {};
+                  final scan = controller.lastScanResult?["scan"] ?? {};
+                  return _buildCapturedImageContent(analysis, scan);
+                },
+              ),
             ),
           ),
         ],
@@ -136,80 +156,78 @@ class HistoryDetailsScreen extends StatelessWidget {
     }
 
     final details = controller.historyDetails;
-    if (details == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+if (details == null) {
+  return const Center(
+    child: CircularProgressIndicator(),
+  );
+}
 
-    return CustomScrollView(
-      slivers: [
-        // App Bar with Image
-        SliverAppBar(
-          expandedHeight: 300.h,
-          floating: false,
-          pinned: true,
-          backgroundColor: AppColors.backgroundColor2,
-          leading: GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              margin: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.arrow_back,
-                color: AppColors.iconColor,
-                size: 22.sp,
-              ),
+return CustomScrollView(
+  slivers: [
+    // App Bar with Image
+    SliverAppBar(
+      expandedHeight: 300.h,
+      floating: false,
+      pinned: true,
+      backgroundColor: AppColors.backgroundColor2,
+      leading: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Container(
+          margin: EdgeInsets.all(8.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.arrow_back,
+            color: AppColors.iconColor,
+            size: 22.sp,
+          ),
+        ),
+      ),
+      actions: [
+        GestureDetector(
+          onTap: () {
+            // Handle delete action
+            _showDeleteDialog(context);
+          },
+          child: Container(
+            margin: EdgeInsets.all(8.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.delete_outline,
+              color: Colors.red,
+              size: 20.sp,
             ),
           ),
-          actions: [
-            GestureDetector(
-              onTap: () {
-                // Handle delete action
-                _showDeleteDialog(context);
-              },
-              child: Container(
-                margin: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.delete_outline,
-                  color: Colors.red,
-                  size: 20.sp,
-                ),
-              ),
+        ),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(details.imageUrl), // <-- this shows the image
+              fit: BoxFit.cover,
             ),
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(details.imageUrl),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      // ignore: deprecated_member_use
-                      Colors.black.withOpacity(0.3),
-                    ],
-                  ),
-                ),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withOpacity(0.3),
+                ],
               ),
             ),
           ),
         ),
-
+      ),
+    ),
         // Content for history items
         SliverToBoxAdapter(
           child: Padding(
@@ -335,144 +353,277 @@ class HistoryDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCapturedImageContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        //!-----tollbar on scroll-------------!
-        Column(
-          children: [
-            SizedBox(height: 8.h),
-            Center(
-              child: Column(
-                children: [
-                  Container(
-                    width: 40.w,
-                    height: 2.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.iconColor,
-                      borderRadius: BorderRadius.circular(2.r),
-                    ),
+  // Widget _buildCapturedImageContent() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       //!-----tollbar on scroll-------------!
+  //       Column(
+  //         children: [
+  //           SizedBox(height: 8.h),
+  //           Center(
+  //             child: Column(
+  //               children: [
+  //                 Container(
+  //                   width: 40.w,
+  //                   height: 2.h,
+  //                   decoration: BoxDecoration(
+  //                     color: AppColors.iconColor,
+  //                     borderRadius: BorderRadius.circular(2.r),
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 4.h),
+  //                 Container(
+  //                   width: 40.w,
+  //                   height: 2.h,
+  //                   decoration: BoxDecoration(
+  //                     color: AppColors.iconColor,
+  //                     borderRadius: BorderRadius.circular(2.r),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           SizedBox(height: 16.h),
+  //         ],
+  //       ),
+  //       //!-----------------------------------!
+  //       // Title
+  //       Text(
+  //         'Red Fort - Historical Monument',
+  //         style: GoogleFonts.inter(
+  //           color: AppColors.textColor1,
+  //           fontSize: 24.sp,
+  //           fontWeight: FontWeight.w600,
+  //         ),
+  //       ),
+        
+  //       SizedBox(height: 16.h),
+        
+  //       // Metadata Row
+  //       Row(
+  //         children: [
+  //           // Location
+  //           Row(
+  //             children: [
+  //               Icon(
+  //                 Icons.location_on,
+  //                 size: 16.sp,
+  //                 color: AppColors.iconColor,
+  //               ),
+  //               SizedBox(width: 4.w),
+  //               Text(
+  //                 'Delhi, India',
+  //                 style: GoogleFonts.inter(
+  //                   color: AppColors.iconColor,
+  //                   fontSize: 14.sp,
+  //                   fontWeight: FontWeight.w400,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+            
+  //           SizedBox(width: 24.w),
+            
+  //           // Year
+  //           Row(
+  //             children: [
+  //               Icon(
+  //                 Icons.business,
+  //                 size: 16.sp,
+  //                 color: AppColors.iconColor,
+  //               ),
+  //               SizedBox(width: 4.w),
+  //               Text(
+  //                 '1648',
+  //                 style: GoogleFonts.inter(
+  //                   color: AppColors.iconColor,
+  //                   fontSize: 14.sp,
+  //                   fontWeight: FontWeight.w400,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //       SizedBox(width: double.infinity,child: Divider(color: AppColors.disabled1, height: 32.h),),
+  //       SizedBox(height: 5.h),
+        
+  //       // Description
+  //       Text(
+  //         'The Red Fort is a historic fort in the city of Delhi in India. It was the main residence of the emperors of the Mughal dynasty for nearly 200 years, until 1857. The fort represents the peak in Mughal architecture under Shah Jahan.',
+  //         style: GoogleFonts.inter(
+  //           color: AppColors.textColor1,
+  //           fontSize: 16.sp,
+  //           fontWeight: FontWeight.w400,
+  //           height: 1.5,
+  //         ),
+  //       ),
+        
+  //       SizedBox(height: 24.h),
+        
+  //       // Location Section
+  //       _buildSection(
+  //         'Location',
+  //         'Located in Old Delhi, the fort was built by the Mughal emperor Shah Jahan as the palace fort of his capital Shahjahanabad.',
+  //         Icons.location_on,
+  //       ),
+        
+  //       SizedBox(height: 16.h),
+        
+  //       // Construction Section
+  //       _buildSection(
+  //         'Construction',
+  //         'Construction began in 1638 and was completed in 1648. The fort was designed by architect Ustad Ahmad Lahori, who also designed the Taj Mahal.',
+  //         Icons.construction,
+  //       ),
+        
+  //       SizedBox(height: 16.h),
+        
+  //       // Architecture Section
+  //       _buildSection(
+  //         'Architecture',
+  //         'The Red Fort showcases the peak of Mughal architecture with its red sandstone walls, white marble inlays, and intricate carvings.',
+  //         Icons.architecture,
+  //       ),
+        
+  //       SizedBox(height: 24.h),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildCapturedImageContent(Map<String, dynamic> analysis, Map<String, dynamic> scan) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      //!-----toolbar on scroll-------------!
+      Column(
+        children: [
+          SizedBox(height: 8.h),
+          Center(
+            child: Column(
+              children: [
+                Container(
+                  width: 40.w,
+                  height: 2.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.iconColor,
+                    borderRadius: BorderRadius.circular(2.r),
                   ),
-                  SizedBox(height: 4.h),
-                  Container(
-                    width: 40.w,
-                    height: 2.h,
-                    decoration: BoxDecoration(
-                      color: AppColors.iconColor,
-                      borderRadius: BorderRadius.circular(2.r),
-                    ),
+                ),
+                SizedBox(height: 4.h),
+                Container(
+                  width: 40.w,
+                  height: 2.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.iconColor,
+                    borderRadius: BorderRadius.circular(2.r),
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16.h),
+        ],
+      ),
+
+      //!-----------------------------------!
+      // Title
+      Text(
+        analysis["landmark_name"] ?? "Unknown Landmark",
+        style: GoogleFonts.inter(
+          color: AppColors.textColor1,
+          fontSize: 24.sp,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+
+      SizedBox(height: 16.h),
+
+      // Metadata Row
+      Row(
+        children: [
+          // Location
+          Row(
+            children: [
+              Icon(Icons.location_on, size: 16.sp, color: AppColors.iconColor),
+              SizedBox(width: 4.w),
+              Text(
+                analysis["location"] ?? "Unknown Location",
+                style: GoogleFonts.inter(
+                  color: AppColors.iconColor,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
-            SizedBox(height: 16.h),
-          ],
-        ),
-        //!-----------------------------------!
-        // Title
-        Text(
-          'Red Fort - Historical Monument',
-          style: GoogleFonts.inter(
-            color: AppColors.textColor1,
-            fontSize: 24.sp,
-            fontWeight: FontWeight.w600,
+            ],
           ),
-        ),
-        
-        SizedBox(height: 16.h),
-        
-        // Metadata Row
-        Row(
-          children: [
-            // Location
-            Row(
-              children: [
-                Icon(
-                  Icons.location_on,
-                  size: 16.sp,
+
+          SizedBox(width: 24.w),
+
+          // Year
+          Row(
+            children: [
+              Icon(Icons.business, size: 16.sp, color: AppColors.iconColor),
+              SizedBox(width: 4.w),
+              Text(
+                analysis["year_completed"]?.toString() ?? "N/A",
+                style: GoogleFonts.inter(
                   color: AppColors.iconColor,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
                 ),
-                SizedBox(width: 4.w),
-                Text(
-                  'Delhi, India',
-                  style: GoogleFonts.inter(
-                    color: AppColors.iconColor,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-            
-            SizedBox(width: 24.w),
-            
-            // Year
-            Row(
-              children: [
-                Icon(
-                  Icons.business,
-                  size: 16.sp,
-                  color: AppColors.iconColor,
-                ),
-                SizedBox(width: 4.w),
-                Text(
-                  '1648',
-                  style: GoogleFonts.inter(
-                    color: AppColors.iconColor,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(width: double.infinity,child: Divider(color: AppColors.disabled1, height: 32.h),),
-        SizedBox(height: 5.h),
-        
-        // Description
-        Text(
-          'The Red Fort is a historic fort in the city of Delhi in India. It was the main residence of the emperors of the Mughal dynasty for nearly 200 years, until 1857. The fort represents the peak in Mughal architecture under Shah Jahan.',
-          style: GoogleFonts.inter(
-            color: AppColors.textColor1,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w400,
-            height: 1.5,
+              ),
+            ],
           ),
+        ],
+      ),
+
+      SizedBox(width: double.infinity, child: Divider(color: AppColors.disabled1, height: 32.h)),
+      SizedBox(height: 5.h),
+
+      // Description
+      Text(
+        analysis["historical_overview"] ?? "No description available.",
+        style: GoogleFonts.inter(
+          color: AppColors.textColor1,
+          fontSize: 16.sp,
+          fontWeight: FontWeight.w400,
+          height: 1.5,
         ),
-        
-        SizedBox(height: 24.h),
-        
-        // Location Section
-        _buildSection(
-          'Location',
-          'Located in Old Delhi, the fort was built by the Mughal emperor Shah Jahan as the palace fort of his capital Shahjahanabad.',
-          Icons.location_on,
-        ),
-        
-        SizedBox(height: 16.h),
-        
-        // Construction Section
-        _buildSection(
-          'Construction',
-          'Construction began in 1638 and was completed in 1648. The fort was designed by architect Ustad Ahmad Lahori, who also designed the Taj Mahal.',
+      ),
+
+      SizedBox(height: 24.h),
+
+      // Location Section
+      _buildSection(
+        "Location",
+        analysis["location"] ?? "Unknown location details.",
+        Icons.location_on,
+      ),
+
+      SizedBox(height: 16.h),
+
+      // Construction Section
+      _buildSection(
+          "Construction",
+          analysis["materials"] ?? "No construction details available.",
           Icons.construction,
         ),
-        
-        SizedBox(height: 16.h),
-        
-        // Architecture Section
-        _buildSection(
-          'Architecture',
-          'The Red Fort showcases the peak of Mughal architecture with its red sandstone walls, white marble inlays, and intricate carvings.',
+
+      SizedBox(height: 16.h),
+      // Architecture Section
+      _buildSection(
+          "Architecture",
+          analysis["architectural_style"] ?? "No architecture details available.",
           Icons.architecture,
         ),
-        
-        SizedBox(height: 24.h),
-      ],
-    );
-  }
+
+      SizedBox(height: 24.h),
+    ],
+  );
+}
+
 
   Widget _buildHistoryContent(dynamic details) {
     return Column(

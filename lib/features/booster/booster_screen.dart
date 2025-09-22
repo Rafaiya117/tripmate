@@ -140,49 +140,38 @@ class BoosterScreen extends StatelessWidget {
     );
   }
 
-  void _handleBoosterTap(BuildContext context, BoosterController controller, booster) {
-    controller.selectBooster(booster.id);
-    
-    // Show purchase confirmation
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Purchase Booster'),
-          content: Text('Do you want to purchase ${booster.duration} for ${booster.price}?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                final success = await controller.purchaseBooster(booster.id);
-                if (success && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Booster purchased successfully!'),
-                      backgroundColor: Colors.green,
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
-                  Navigator.of(context).pop(); // Return to previous screen
-                } else if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to purchase booster. Please try again.'),
-                      backgroundColor: Colors.red,
-                      duration: const Duration(seconds: 3),
-                    ),
-                  );
-                }
-              },
-              child: Text('Purchase'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  void _handleBoosterTap(BuildContext context, BoosterController controller, booster) async {
+  controller.selectBooster(booster.id);
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text('Purchase Booster'),
+      content: Text('Do you want to purchase ${booster.duration} for ${booster.price}?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Cancel')),
+        ElevatedButton(
+          onPressed: () async {
+            Navigator.of(context).pop(); // close dialog
+
+            final success = await controller.purchaseBooster(booster.duration);
+
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(success
+                      ? 'Booster purchased successfully!'
+                      : 'Failed to purchase booster. Please try again.'),
+                  backgroundColor: success ? Colors.green : Colors.red,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+          },
+          child: Text('Purchase'),
+        ),
+      ],
+    ),
+  );
+}
+
 }

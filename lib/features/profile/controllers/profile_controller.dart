@@ -52,7 +52,7 @@ Future<void> _loadProfile() async {
   notifyListeners();
 
   try {
-    const String apiUrl = "https://tourapi.dailo.app/api/payments/profile/"; 
+    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/payments/profile/"; 
     final dio = Dio();
 
     final response = await dio.get(

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trip_mate/config/colors/colors.dart';
+import 'package:provider/provider.dart';
+import 'package:trip_mate/features/camera/controllers/scan_controller.dart';
 import 'package:trip_mate/features/camera/custom_widget/custome_circle_indigator_widget.dart';
 
 class ImageViewScreen extends StatefulWidget {
@@ -60,10 +61,34 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
     });
   }
 
-  void _navigateToHistoryDetails() {
-    // Navigate to history details screen with the captured image
-    context.push('/history_details?imagePath=${Uri.encodeComponent(widget.imagePath)}');
+  // void _navigateToHistoryDetails() {
+  //   // Navigate to history details screen with the captured image
+  //   context.push('/history_details?imagePath=${Uri.encodeComponent(widget.imagePath)}');
+  // }
+  void _navigateToHistoryDetails() async {
+  final scanController = context.read<ScanController>();
+
+  try {
+    await scanController.uploadScan(widget.imagePath);
+
+    if (scanController.lastScanResult != null) {
+      final scanId = scanController.lastScanResult!['id'].toString();
+
+      context.push(
+        '/history_details',
+        extra: {
+          'historyId': scanId,
+          'capturedImagePath': widget.imagePath,
+        },
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Failed to analyze image")),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

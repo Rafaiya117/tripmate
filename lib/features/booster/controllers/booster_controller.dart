@@ -93,49 +93,49 @@ class BoosterController extends ChangeNotifier {
   }
 
   Future<bool> purchaseBooster(String duration) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-      final authService = AuthService();
-      await authService.loadAuthState();
-      _token = authService.token;
+  try {
+    _isLoading = true;
+    notifyListeners();
+    final authService = AuthService();
+    await authService.loadAuthState();
+    _token = authService.token;
 
-      final dio = Dio();
-      final response = await dio.post(
-        "https://tourapi.dailo.app/api/payments/create-checkout-session/", 
-        data: {"duration": duration},
-        options: Options(
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $_token",
-          },
-        ),
-      );
+    final dio = Dio();
+    final response = await dio.post(
+      "https://ppp7rljm-8000.inc1.devtunnels.ms/api/payments/create-checkout-session/",
+      data: {"plan_name": duration}, 
+      options: Options(
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $_token",
+        },
+      ),
+    );
 
-      if (response.statusCode == 200 && response.data["checkout_url"] != null) {
-        final checkoutUrl = response.data["checkout_url"];
-
+    if (response.statusCode == 200 && response.data["checkout_url"] != null) {
+      final checkoutUrl = response.data["checkout_url"];
         if (await canLaunchUrl(Uri.parse(checkoutUrl))) {
-          await launchUrl(Uri.parse(checkoutUrl),
-            mode: LaunchMode.externalApplication);
+          await launchUrl(
+            Uri.parse(checkoutUrl),
+            mode: LaunchMode.externalApplication,
+          );
         }
-
         _isLoading = false;
-        notifyListeners();
-        return true;
-      } else {
-        _errorMessage = "Invalid response from server";
-        _isLoading = false;
-        notifyListeners();
-        return false;
-      }
-    } catch (e) {
-      _errorMessage = 'Failed to purchase booster: $e';
+      notifyListeners();
+      return true;
+    } else {
+      _errorMessage = "Invalid response from server";
       _isLoading = false;
       notifyListeners();
       return false;
     }
+  } catch (e) {
+    _errorMessage = 'Failed to purchase booster: $e';
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
+}
 
   void clearError() {
     _errorMessage = null;

@@ -54,7 +54,7 @@ class EditProfileController extends ChangeNotifier {
       final dio = Dio();
 
       final response = await dio.get(
-        "https://tourapi.dailo.app/api/users/me/", 
+        "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/me/", 
         options: Options(
           headers: {
             "Authorization": "Bearer $_token",
@@ -172,7 +172,7 @@ class EditProfileController extends ChangeNotifier {
     });
 
     final response = await dio.patch(
-      "https://tourapi.dailo.app/api/users/edit-profile/",
+      "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/edit-profile/",
       data: formData,
       options: Options(
         headers: {

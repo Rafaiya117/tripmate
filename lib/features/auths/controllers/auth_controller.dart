@@ -153,7 +153,7 @@ class AuthController extends ChangeNotifier {
       return false;
     }
 
-    const String apiUrl = "https://tourapi.dailo.app/api/users/verify-otp/";
+    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/verify-otp/";
     final dio = Dio();
     debugPrint("📩 Sending OTP verify request: {otp: $otp, otp_token: $otpToken}");
 
@@ -229,7 +229,7 @@ class AuthController extends ChangeNotifier {
       return false;
     }
 
-    const String apiUrl = "https://tourapi.dailo.app/api/users/reset-password/";
+    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/reset-password/";
     final dio = Dio();
 
     debugPrint("📩 Sending Reset Password Request: "
