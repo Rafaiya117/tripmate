@@ -102,7 +102,7 @@ class BoosterController extends ChangeNotifier {
 
     final dio = Dio();
     final response = await dio.post(
-      "https://ppp7rljm-8000.inc1.devtunnels.ms/api/payments/create-checkout-session/",
+      "Baseurl.baseUrl/apiapi/payments/create-checkout-session/",
       data: {"plan_name": duration}, 
       options: Options(
         headers: {

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -44,7 +45,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Forgot password',
+                      context.tr('forgot_password'),
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 22.sp,
@@ -54,7 +55,7 @@ class ForgotPasswordPage extends StatelessWidget {
                     ),
                     SizedBox(height: 20.h),
                     CustomInputField(
-                      label: "Enter valid email",
+                      label: context.tr("enter_valid"),
                       hintText: "example@mail.com",
                       controller: uiController.emailController,
                     ),
@@ -99,7 +100,7 @@ class ForgotPasswordPage extends StatelessWidget {
                     Center(
                       child: Text.rich(
                         TextSpan(
-                          text: "Don't have an account? ",
+                          text: context.tr("dont_have_account"),
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w400,
                             fontSize: 16.sp,
@@ -108,7 +109,7 @@ class ForgotPasswordPage extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text: 'Sign up',
+                              text: context.tr('sign_up'),
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 16.sp,
@@ -135,7 +136,7 @@ class ForgotPasswordPage extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text("Or continue with"),
+                          child: Text(context.tr("or_continue")),
                         ),
                         Expanded(
                           child: Divider(

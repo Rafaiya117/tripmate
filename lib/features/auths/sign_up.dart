@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,7 +29,7 @@ class SignUp extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Signup/Sign in with Email\naddress',
+                      context.tr('Signup/Sign in with Email\naddress'),
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 22.sp,
@@ -38,19 +39,19 @@ class SignUp extends StatelessWidget {
                     ),
                     SizedBox(height: 20.h),
                     CustomInputField(
-                      label: "Enter user name",
+                      label: context.tr("enter_user_name"),
                       hintText: "Arif Hossain",
                       controller: uiController.nameController,
                     ),
                     SizedBox(height: 10.h),
                     CustomInputField(
-                      label: "Enter user email",
+                      label: context.tr("enter_user_email"),
                       hintText: "example@mail.com",
                       controller: uiController.emailController,
                     ),
                     SizedBox(height: 10.h),
                     CustomInputField(
-                      label: "Create password",
+                      label: context.tr("create_pass"),
                       hintText: "********",
                       controller: uiController.passwordController,
                       isPassword: true,
@@ -61,7 +62,7 @@ class SignUp extends StatelessWidget {
                     ),
                     SizedBox(height: 10.h),
                     CustomInputField(
-                      label: "Confirm password",
+                      label: context.tr("confirm_pass"),
                       hintText: "********",
                       controller: uiController.confirmPasswordController,
                       isPassword: true,
@@ -100,7 +101,7 @@ class SignUp extends StatelessWidget {
                               ),
                               children: [
                                 TextSpan(
-                                  text: 'By pressing the Continue button,you agree to the ',
+                                  text: context.tr('condition'),
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 12.sp,
@@ -109,7 +110,7 @@ class SignUp extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: 'Terms and Conditions',
+                                  text: context.tr('condition_h2'),
                                   style: GoogleFonts.inter(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 12.sp,
@@ -118,7 +119,7 @@ class SignUp extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: ' of Tripmate',
+                                  text: context.tr(' condition_h3'),
                                   style: TextStyle(color: AppColors.labelTextColor),
                                 ),
                               ],
@@ -129,7 +130,7 @@ class SignUp extends StatelessWidget {
                     ),
                     SizedBox(height: 20.h),
                     CustomButton(
-                      text: "Sign up",
+                      text: context.tr("sign_up"),
                       onPressed: () async {
                         final success = await authService.signUp(
                           uiController.nameController.text,
@@ -142,8 +143,7 @@ class SignUp extends StatelessWidget {
                           ) async {
                             if (authService.pendingImagePath != null) {
                               final imagePath = authService.pendingImagePath!;
-                              await authService
-                                  .clearPendingImagePath(); // Clear the pending path
+                              await authService.clearPendingImagePath(); // Clear the pending path
                               context.go(
                                 '/image_view?imagePath=${Uri.encodeComponent(imagePath)}',
                               );
@@ -165,7 +165,7 @@ class SignUp extends StatelessWidget {
                     Center(
                       child: Text.rich(
                         TextSpan(
-                          text: "Have an account? ",
+                          text: context.tr("have_acc"),
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w400,
                             fontSize: 16.sp,
@@ -174,7 +174,7 @@ class SignUp extends StatelessWidget {
                           ),
                           children: [
                             TextSpan(
-                              text: 'Sign In',
+                              text: context.tr('sign_in'),
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 16.sp,

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:trip_mate/config/baseurl/baseurl.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:trip_mate/features/history/models/history_model.dart';
 
@@ -18,8 +19,10 @@ class HistoryController extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-
+  Baseurl base = Baseurl();
+  
   HistoryController() {
+    debugPrint("!=======Card $_token");
     _loadMockData();
   }
 
@@ -93,13 +96,27 @@ class HistoryController extends ChangeNotifier {
   notifyListeners();
 
   try {
+    // Use a single instance of AuthService
     final authService = AuthService();
+
+    // Wait for the token to be loaded
     await authService.loadAuthState();
+
+    // Now get the token
     _token = authService.token;
-    
+    debugPrint("🔑 Using access token: $_token");
+
+    if (_token == null || _token!.isEmpty) {
+      debugPrint("⚠️ Access token is null, cannot fetch history");
+      _isLoading = false;
+      _errorMessage = "No access token available";
+      notifyListeners();
+      return;
+    }
+
     final dio = Dio();
     final response = await dio.get(
-      "https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/history/", 
+      "${Baseurl.baseUrl}/api/scans/scan/history/",
       options: Options(
         headers: {
           "Authorization": "Bearer $_token",
@@ -109,27 +126,29 @@ class HistoryController extends ChangeNotifier {
     );
 
     if (response.statusCode == 200) {
-      final data = response.data is String
-        ? json.decode(response.data) 
-        : response.data;
+      final data = response.data is String ? json.decode(response.data) : response.data;
+      final results = List.from(data["results"] ?? []);
+      debugPrint("📦 API returned ${results.length} history items");
 
-      final results = data["results"] as List;
-
-      _historyList = results.map((item) {            
-        final scan = item["scan"];
-        final analysis = item["analysis"]; //location_name
+      _historyList = results.map((item) {
+        final scan = item["scan"] ?? {};
+        final analysis = item["analysis"] ?? {};
 
         return HistoryModel(
-          id: scan["id"].toString(),
+          id: scan["id"]?.toString() ?? "",
           imageUrl: scan["image_url"] ?? "",
-          date: DateTime.tryParse(scan["created_at"] ?? "") ?.toLocal().toString().split(" ").first ?? "",
-          location: analysis["location"] ?? "Unknown",
-          description: scan["location_name"] ?? "No description available",
+          date: DateTime.tryParse(scan["created_at"] ?? "")
+            ?.toLocal().toString().split(" ").first ?? "",
+          location: scan["location_name"] ?? analysis["location"] ?? "Unknown",
+          description: analysis["historical_overview"] ??
+            analysis["landmark_name"] ??
+            "No description available",
           createdAt: DateTime.tryParse(scan["created_at"] ?? "") ?? DateTime.now(),
         );
       }).toList();
 
       _filteredList = List.from(_historyList);
+      debugPrint("✅ History loaded: ${_historyList.length}");
       _errorMessage = null;
     } else {
       _errorMessage = "Failed to load data. Status: ${response.statusCode}";
@@ -137,6 +156,7 @@ class HistoryController extends ChangeNotifier {
   } catch (e) {
     _errorMessage = "Error: $e";
   }
+
   _isLoading = false;
   notifyListeners();
 }
@@ -180,7 +200,7 @@ class HistoryController extends ChangeNotifier {
     final dio = Dio();
 
     final response = await dio.delete(
-      "https://your-api-url.com/history/$id",
+      "${Baseurl.baseUrl}/api/scans/$id/delete",
       options: Options(
         headers: {
           "Authorization": "Bearer $_token",

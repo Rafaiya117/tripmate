@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -41,7 +42,7 @@ class OTPVerificationPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'OTP authentication code',
+                      context.tr('otp_auth'),
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 22.sp,
@@ -104,7 +105,7 @@ class OTPVerificationPage extends StatelessWidget {
                     // Instructions
                     Center(
                       child: Text(
-                        'Enter the 4-digit code you received via\nemail: example@mail.com',
+                        context.tr('four_digit'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           color: AppColors.disabled3,
@@ -116,7 +117,7 @@ class OTPVerificationPage extends StatelessWidget {
                     ),
                     SizedBox(height: 40.h),
                     
-                                         // OTP Input Fields
+                    // OTP Input Fields
                      Center(
                        child: Row(
                          mainAxisAlignment: MainAxisAlignment.center,
@@ -175,7 +176,7 @@ class OTPVerificationPage extends StatelessWidget {
                           authController.resendOTP();
                         },
                         child: Text(
-                          'Resend new code (${authController.resendTimer})',
+                          context.tr('resend_otp (${authController.resendTimer})'),
                           style: GoogleFonts.inter(
                             color: AppColors.disabled3,
                             fontSize: 16.sp,
@@ -186,8 +187,7 @@ class OTPVerificationPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    
-                                         // Error Message
+                    // Error Message
                      if (authController.errorMessage != null)
                        Center(
                          child: Padding(

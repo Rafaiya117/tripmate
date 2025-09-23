@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -42,7 +43,7 @@ class ResetPasswordPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Reset password',
+                      context.tr('reset_pass_header'),
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 22.sp,
@@ -54,7 +55,7 @@ class ResetPasswordPage extends StatelessWidget {
                     
                     // New Password Field
                     CustomInputField(
-                      label: "Enter new password",
+                      label: context.tr("enter_new_pass"),
                       hintText: "Enter your new password",
                       controller: uiController.newPasswordController,
                       isPassword: true,
@@ -67,7 +68,7 @@ class ResetPasswordPage extends StatelessWidget {
                     
                     // Confirm Password Field
                     CustomInputField(
-                      label: "Confirm password",
+                      label: context.tr("confirm_pass"),
                       hintText: "Confirm your new password",
                       controller: uiController.confirmNewPasswordController,
                       isPassword: true,

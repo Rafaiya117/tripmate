@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -90,8 +91,20 @@ class _LoginPageState extends State<LoginPage> {
                 items: ['English', '简体中文', '繁體中文'],
                 selectedValue: uiController.selectedValue,
                 hintText: 'Select Language',
+                // onChanged: (value) {
+                //   uiController.setSelectedValue(value);
+                // },
                 onChanged: (value) {
-                  uiController.setSelectedValue(value);
+                  if (value != null) {
+                    uiController.setLanguage(value);
+                  if (value == 'English') {
+                    context.setLocale(const Locale('en', 'US'));
+                  } else if (value == '简体中文') {
+                    context.setLocale(const Locale('zh', 'CN'));
+                  } else if (value == '繁體中文') {
+                    context.setLocale(const Locale('zh', 'TW'));
+                  }
+                  }
                 },
                 buttonWidth: 120.w,
                 buttonHeight: 24.h,
@@ -111,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Sign in',
+                      context.tr('sign_in'),
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600,
                         fontSize: 22.sp,
@@ -121,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 8.h),
                     CustomInputField(
-                      label: "Enter user email address",
+                      label: context.tr("enter_email"),
                       hintText: "example@mail.com",
                       controller: uiController.emailController,
                       isError: _emailError,
@@ -138,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 10.h),
                     CustomInputField(
-                      label: "Enter Password",
+                      label: context.tr("enter_pass"),
                       hintText: "********",
                       controller: uiController.passwordController,
                       isPassword: true,
@@ -194,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.only(left: 208),
                       child: Text.rich(
                         TextSpan(
-                          text: 'Forgot Password',
+                          text: context.tr('forgot_password'),
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w400,
                             fontSize: 16.sp,
@@ -210,7 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 20.h),
                     CustomButton(
-                      text: "Log in",
+                      text: context.tr("log_in"),
                       onPressed: () async {
                         // Validate form fields first
                         if (!_validateForm()) {
@@ -249,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                     Center(
                       child: Text.rich(
                         TextSpan(
-                          text: "Don't have an account? ",
+                          text: context.tr("dont_have_account"),
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.w400,
                             fontSize: 16.sp,
@@ -258,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'Sign up',
+                              text: context.tr('sign_in'),
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 16.sp,
@@ -285,7 +298,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text("or continue with"),
+                          child: Text(context.tr("or_continue")),
                         ),
                         Expanded(
                           child: Divider(

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:trip_mate/config/baseurl/baseurl.dart';
 import 'dart:io';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
 
@@ -36,7 +37,9 @@ class EditProfileController extends ChangeNotifier {
   File? get selectedImage => _selectedImage;
   String get currentImageUrl => _currentImageUrl;
   String? _token;
-
+  
+  Baseurl base = Baseurl();
+  
   EditProfileController() {
     _loadInitialData();
   }
@@ -54,7 +57,7 @@ class EditProfileController extends ChangeNotifier {
       final dio = Dio();
 
       final response = await dio.get(
-        "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/me/", 
+        "${Baseurl.baseUrl}/api/users/me/", 
         options: Options(
           headers: {
             "Authorization": "Bearer $_token",
@@ -140,9 +143,7 @@ class EditProfileController extends ChangeNotifier {
 
   // Save profile changes
   Future<bool> saveProfile() async {
-  if (!validateForm()) {
-    return false;
-  }
+  if (!validateForm()) return false;
 
   _isSaving = true;
   _errorMessage = null;
@@ -159,20 +160,20 @@ class EditProfileController extends ChangeNotifier {
     // Prepare FormData
     final formData = FormData.fromMap({
       "username": fullNameController.text.trim(),
-      "email": emailController.text.trim(),
-      // if (oldPasswordController.text.isNotEmpty)
-      //   "old_password": oldPasswordController.text,
-      // if (newPasswordController.text.isNotEmpty)
-      //   "new_password": newPasswordController.text,
-      // if (_selectedImage != null)
-      //   "profile_picture": await MultipartFile.fromFile(
-      //     _selectedImage!.path,
-      //     filename: _selectedImage!.path.split('/').last,
-      //   ),
-    });
+        "email": emailController.text.trim(),
+        if (oldPasswordController.text.isNotEmpty)
+          "old_password": oldPasswordController.text,
+        if (newPasswordController.text.isNotEmpty)
+          "new_password": newPasswordController.text,
+        if (_selectedImage != null)
+          "profile_picture": await MultipartFile.fromFile(
+          _selectedImage!.path,
+          filename: _selectedImage!.path.split('/').last,
+        ),
+      });
 
     final response = await dio.patch(
-      "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/edit-profile/",
+      "${Baseurl.baseUrl}/api/users/edit-profile/",
       data: formData,
       options: Options(
         headers: {
@@ -183,6 +184,11 @@ class EditProfileController extends ChangeNotifier {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
+      // Update local selected image with server response if needed
+      if (response.data["profile_picture"] != null) {
+        _selectedImage = response.data["profile_picture"];
+      }
+
       _successMessage = "Profile updated successfully!";
       _isSaving = false;
       notifyListeners();
@@ -200,6 +206,7 @@ class EditProfileController extends ChangeNotifier {
     return false;
   }
 }
+
 
   // Clear messages
   void clearError() {

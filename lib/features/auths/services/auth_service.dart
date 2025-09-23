@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trip_mate/config/baseurl/baseurl.dart';
 
 class AuthService extends ChangeNotifier {
   static const String _isLoggedInKey = 'isLoggedIn';
@@ -22,7 +23,7 @@ class AuthService extends ChangeNotifier {
   String? get pendingImagePath => _pendingImagePath;
 
   String? _token;
-   String? _refreshToken; 
+  String? _refreshToken; 
   String? get token=>_token;
   String? get refreshToken => _refreshToken;
 
@@ -32,6 +33,7 @@ class AuthService extends ChangeNotifier {
   String? _otpToken;
   String? get otpToken => _otpToken;
 
+ Baseurl base = Baseurl();
   
 
   AuthService() {
@@ -78,13 +80,20 @@ class AuthService extends ChangeNotifier {
   }
 }
 
+Future<void> updateAuthTokens(String access, String refresh) async {
+    _token = access;
+    _refreshToken = refresh;
+    await _saveAuthState();
+    notifyListeners();
+  }
+
 //!---------sent otp----------!
 Future<bool> sendOtp(String email) async {
   try {
     _isLoading = true;
     notifyListeners();
 
-    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/forgot-password/";
+    String apiUrl = "${Baseurl.baseUrl}/api/users/forgot-password/";
 
     final dio = Dio();
     final response = await dio.post(
@@ -130,7 +139,7 @@ Future<bool> sendOtp(String email) async {
     notifyListeners();
     debugPrint("!---------Attempting login with email: $email");
 
-    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/login/";
+    String apiUrl = "${Baseurl.baseUrl}/api/users/login/";
 
     final dio = Dio();
     final response = await dio.post(
@@ -194,7 +203,7 @@ Future<bool> sendOtp(String email) async {
     _isLoading = true;
     notifyListeners();
 
-    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/signup/";
+    String apiUrl = "${Baseurl.baseUrl}/api/users/signup/";
 
     final dio = Dio();
     final response = await dio.post(
@@ -257,7 +266,7 @@ Future<bool> sendOtp(String email) async {
 
       final dio = Dio();
       final response = await dio.post(
-        "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/logout/",
+        "${Baseurl.baseUrl}/api/users/logout/",
         data: {"refresh": _refreshToken}, 
         options: Options(
           headers: {

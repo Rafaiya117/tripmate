@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:trip_mate/config/baseurl/baseurl.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:trip_mate/features/history/models/history_details_model.dart';
 
@@ -15,6 +16,8 @@ class HistoryDetailsController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? _token;
+
+  Baseurl base = Baseurl();
   // Load history details by ID
   Future<void> loadHistoryDetails(String id) async {
   if (_historyDetails != null) return; // Already loaded
@@ -145,13 +148,15 @@ class HistoryDetailsController extends ChangeNotifier {
 
 Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
   try {
-    final String apiUrl = 'https://ppp7rljm-8000.inc1.devtunnels.ms/api/scans/scan/59';
+    final String apiUrl = '${Baseurl.baseUrl}/api/scans/scan/$id';
     final dio = Dio();
 
-    dio.options.headers = {
+   dio.options.headers = {
       'Authorization': 'Bearer $_token',
       'Accept': 'application/json',
     };
+
+    print("📡 Fetching history details from: $apiUrl");
 
     final response = await dio.get(
       apiUrl,
@@ -160,15 +165,21 @@ Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
       ),
     );
 
+    print("✅ Status code: ${response.statusCode}");
+    print("📦 Response data: ${response.data}");
+
     if (response.statusCode == 200) {
       final data = response.data;
       final scan = data['scan'];
+      print("🔍 Scan data: $scan");
 
       Map<String, dynamic> analysis = {};
       if (data['analysis'] != null) {
         analysis = data['analysis'];
+        print("📊 Analysis (direct): $analysis");
       } else if (scan['result_text'] != null) {
         analysis = jsonDecode(scan['result_text']);
+        print("📊 Analysis (decoded): $analysis");
       }
 
       return HistoryDetailsModel(
@@ -184,7 +195,7 @@ Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
         additionalInfo: analysis['cultural_impact'] ?? 'Additional info not available.',
       );
     } else if (response.statusCode == 401) {
-      print('Unauthorized: Check your API token');
+      print('❌ Unauthorized: Check your API token');
       return HistoryDetailsModel(
         id: id,
         title: 'Unauthorized',
@@ -198,6 +209,7 @@ Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
         additionalInfo: 'N/A',
       );
     } else {
+      print("⚠️ Unexpected error: ${response.statusCode} - ${response.statusMessage}");
       return HistoryDetailsModel(
         id: id,
         title: 'Error',
@@ -211,8 +223,9 @@ Future<HistoryDetailsModel> _getMockHistoryDetails(String id) async {
         additionalInfo: 'N/A',
       );
     }
-  } catch (e) {
-    print('Error fetching history details: $e');
+  } catch (e, s) {
+    print('💥 Exception caught: $e');
+    print('📌 Stack trace: $s');
     return HistoryDetailsModel(
       id: id,
       title: 'Error',

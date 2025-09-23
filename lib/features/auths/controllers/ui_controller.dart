@@ -58,10 +58,14 @@ class UIController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedLang(String? value) {
-    _selectedLang = value;
+   void setLanguage(String language) {
+    _selectedLang = language;
     notifyListeners();
   }
+  // void setSelectedLang(String? value) {
+  //   _selectedLang = value;
+  //   notifyListeners();
+  // }
 
   void setSelectedValue(String? value) {
     _selectedValue = value;

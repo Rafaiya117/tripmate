@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +69,7 @@ class ResetPasswordSuccessPage extends StatelessWidget {
                     // Success Title
                     Center(
                       child: Text(
-                        'Password reset\nsuccessful',
+                        context.tr('password_reset'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           color: AppColors.textColor1,
@@ -84,7 +85,7 @@ class ResetPasswordSuccessPage extends StatelessWidget {
                     // Success Message
                     Center(
                       child: Text(
-                        'You have successfully reset your\npassword. Please use your new password\nwhen you\'re logging in',
+                        context.tr('successful_login'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.inter(
                           color: AppColors.labelTextColor,
@@ -99,7 +100,7 @@ class ResetPasswordSuccessPage extends StatelessWidget {
                     
                     // Go to Login Button
                     CustomButton(
-                      text: "Go to login",
+                      text: context.tr("new_pass"),
                       onPressed: () {
                         // Navigate to login screen
                         context.go('/login_page');

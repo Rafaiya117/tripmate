@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:trip_mate/config/baseurl/baseurl.dart';
 import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
 import 'package:trip_mate/features/profile/models/profile_model.dart';
@@ -15,7 +16,7 @@ class ProfileController extends ChangeNotifier {
   ProfileModel? get profile => _profile;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-
+  Baseurl base = Baseurl();
     ProfileController() {
     _init();
   }
@@ -52,7 +53,7 @@ Future<void> _loadProfile() async {
   notifyListeners();
 
   try {
-    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/payments/profile/"; 
+    String apiUrl = "${Baseurl.baseUrl}/api/payments/profile/"; 
     final dio = Dio();
 
     final response = await dio.get(

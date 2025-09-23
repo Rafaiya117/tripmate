@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:trip_mate/config/baseurl/baseurl.dart';
 
 class AuthController extends ChangeNotifier {
   bool _isLoading = false;
@@ -14,6 +15,8 @@ class AuthController extends ChangeNotifier {
 
   String? _otpToken;
   String? get otpToken => _otpToken;
+
+  Baseurl base = Baseurl();
 
   void setLoading(bool loading) {
     _isLoading = loading;
@@ -152,8 +155,7 @@ class AuthController extends ChangeNotifier {
       setLoading(false);
       return false;
     }
-
-    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/verify-otp/";
+    final String apiUrl = "${Baseurl.baseUrl}/api/users/verify-otp/";
     final dio = Dio();
     debugPrint("📩 Sending OTP verify request: {otp: $otp, otp_token: $otpToken}");
 
@@ -229,7 +231,7 @@ class AuthController extends ChangeNotifier {
       return false;
     }
 
-    const String apiUrl = "https://ppp7rljm-8000.inc1.devtunnels.ms/api/users/reset-password/";
+    String apiUrl = "${Baseurl.baseUrl}/api/users/reset-password/";
     final dio = Dio();
 
     debugPrint("📩 Sending Reset Password Request: "

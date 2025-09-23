@@ -114,105 +114,104 @@ class EditProfileScreen extends StatelessWidget {
   }
 
   Widget _buildProfileImageSection(BuildContext context, EditProfileController controller) {
-    return Column(
-      children: [
-        // Profile Image Container
-        Center(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 120.w,
-                height: 120.w,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primaryColor, width: 4.w),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: controller.selectedImage != null
+  return Column(
+    children: [
+      Center(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 120.w,
+              height: 120.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.primaryColor, width: 4.w),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryColor.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: controller.selectedImage != null
                     ? Image.file(
-                      controller.selectedImage!,
+                        controller.selectedImage!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return _buildDefaultProfileImage();
                         },
                       )
-                      : Image.network(
-                        controller.currentImageUrl,
-                        fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return _buildDefaultProfileImage();
-                    },
+                    : (controller.currentImageUrl.isNotEmpty
+                        ? Image.network(
+                            controller.currentImageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildDefaultProfileImage();
+                            },
+                          )
+                        : _buildDefaultProfileImage()),
+              ),
+            ),
+
+            Positioned(
+              bottom: 45,
+              right: 45,
+              child: GestureDetector(
+                onTap: () => controller.showImagePickerOptions(context),
+                child: Container(
+                  width: 36.w,
+                  height: 36.w,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_outlined,
+                    size: 20.sp,
+                    color: Colors.white,
                   ),
                 ),
               ),
-
-              // Camera Icon Overlay
-              Positioned(
-                bottom: 45,
-                right: 45,
-                child: GestureDetector(
-                  onTap: () => controller.showImagePickerOptions(context),
-                  child: Container(
-                    width: 36.w,
-                    height: 36.w,
-                    decoration: BoxDecoration(
-                      //color: AppColors.primaryColor,
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(12.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryColor.withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.camera_alt_outlined,
-                      size: 20.sp,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        
-        SizedBox(height: 16.h),
-        
-        // Profile Image Text
-        Text(
-          context.tr('tap_to_change'),
-          style: GoogleFonts.inter(
-            color: Colors.grey.shade600,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w400,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDefaultProfileImage() {
-    return Container(
-      color: AppColors.disabled1,
-      child: Icon(
-        Icons.person,
-        size: 50.sp,
-        color: AppColors.iconColor,
       ),
-    );
-  }
+
+      SizedBox(height: 16.h),
+
+      Text(
+        context.tr('tap_to_change'),
+        style: GoogleFonts.inter(
+          color: Colors.grey.shade600,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w400,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    ],
+  );
+}
+
+Widget _buildDefaultProfileImage() {
+  return Container(
+    color: AppColors.disabled1,
+    child: Icon(
+      Icons.person,
+      size: 50.sp,
+      color: AppColors.iconColor,
+    ),
+  );
+}
+
 
   Widget _buildFormFields(BuildContext context,EditProfileController controller) {
     return Column(

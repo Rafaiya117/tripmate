@@ -28,7 +28,40 @@
     "cancel_fail":"Failed to cancel subscription. Please try again",
     "delete":"Delete",
 
-    "history":"History"
+    "history":"History",
+    
+    "forgot_password":"Forgot password",
+    "enter_valid":"Enter valid email",
+    "dont_have_account":"Don't have an account?",
+    "sign_up":"Sign up",
+    "or_continue":"Or continue with",
+    "sign_in":"Sign in",
+    "enter_email":"Enter user email address",
+    "enter_pass":"Enter Password",
+    "log_in":"Log in",
+
+    "otp_auth":"OTP authentication code",
+    "four_digit":"Enter the 4-digit code you received via\nemail:",
+    "resend_otp":"Resend new code",
+
+    "password_reset":"Password reset\nsuccessful",
+    "successful_login":"You have successfully reset your\npassword. Please use your new password\nwhen you're logging in",
+    "new_pass":"Go to login",
+
+    "reset_pass_header":"Reset password",
+    "enter_new_pass":"Enter new password",
+    "confirm_pass":"Confirm password",
+    "signup_sign":"Signup/Sign in with Email\naddress",
+    "enter_user_name":"Enter user name",
+    "enter_user_email":"Enter user email",
+    "create_pass":"Create password",
+    "condition":"By pressing the Continue button,you agree to the",
+    "condition_h2":"Terms and Conditions",
+    "condition_h3":"of Tripmate",
+    "have_acc":"Have an account?"
+
+
+
 
 
 

@@ -110,7 +110,7 @@ class HistoryDetailsScreen extends StatelessWidget {
                 builder: (context, controller, child) {
                   final analysis = controller.lastScanResult?["analysis"] ?? {};
                   final scan = controller.lastScanResult?["scan"] ?? {};
-                  return _buildCapturedImageContent(analysis, scan);
+                  return _buildCapturedImageContent(analysis, scan, isLoading: controller.isLoading);
                 },
               ),
             ),
@@ -492,134 +492,149 @@ return CustomScrollView(
   //   );
   // }
 
-  Widget _buildCapturedImageContent(Map<String, dynamic> analysis, Map<String, dynamic> scan) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildCapturedImageContent(Map<String, dynamic> analysis, Map<String, dynamic> scan, {required bool isLoading}) {
+  return Stack(
     children: [
-      //!-----toolbar on scroll-------------!
+      // Main content
       Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 8.h),
-          Center(
-            child: Column(
-              children: [
-                Container(
-                  width: 40.w,
-                  height: 2.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.iconColor,
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
+          //!-----toolbar on scroll-------------!
+          Column(
+            children: [
+              SizedBox(height: 8.h),
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 40.w,
+                      height: 2.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.iconColor,
+                        borderRadius: BorderRadius.circular(2.r),
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Container(
+                      width: 40.w,
+                      height: 2.h,
+                      decoration: BoxDecoration(
+                        color: AppColors.iconColor,
+                        borderRadius: BorderRadius.circular(2.r),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4.h),
-                Container(
-                  width: 40.w,
-                  height: 2.h,
-                  decoration: BoxDecoration(
-                    color: AppColors.iconColor,
-                    borderRadius: BorderRadius.circular(2.r),
-                  ),
-                ),
-              ],
+              ),
+              SizedBox(height: 16.h),
+            ],
+          ),
+
+          //!-----------------------------------!
+          // Title
+          Text(
+            analysis["landmark_name"] ?? "Unknown Landmark",
+            style: GoogleFonts.inter(
+              color: AppColors.textColor1,
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w600,
             ),
           ),
+
           SizedBox(height: 16.h),
-        ],
-      ),
 
-      //!-----------------------------------!
-      // Title
-      Text(
-        analysis["landmark_name"] ?? "Unknown Landmark",
-        style: GoogleFonts.inter(
-          color: AppColors.textColor1,
-          fontSize: 24.sp,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-
-      SizedBox(height: 16.h),
-
-      // Metadata Row
-      Row(
-        children: [
-          // Location
+          // Metadata Row
           Row(
             children: [
-              Icon(Icons.location_on, size: 16.sp, color: AppColors.iconColor),
-              SizedBox(width: 4.w),
-              Text(
-                analysis["location"] ?? "Unknown Location",
-                style: GoogleFonts.inter(
-                  color: AppColors.iconColor,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
+              // Location
+              Row(
+                children: [
+                  Icon(Icons.location_on, size: 16.sp, color: AppColors.iconColor),
+                  SizedBox(width: 4.w),
+                  Text(
+                    analysis["location"] ?? "Unknown Location",
+                    style: GoogleFonts.inter(
+                      color: AppColors.iconColor,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(width: 24.w),
+
+              // Year
+              Row(
+                children: [
+                  Icon(Icons.business, size: 16.sp, color: AppColors.iconColor),
+                  SizedBox(width: 4.w),
+                  Text(
+                    analysis["year_completed"]?.toString() ?? "N/A",
+                    style: GoogleFonts.inter(
+                      color: AppColors.iconColor,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
 
-          SizedBox(width: 24.w),
+          SizedBox(width: double.infinity, child: Divider(color: AppColors.disabled1, height: 32.h)),
+          SizedBox(height: 5.h),
 
-          // Year
-          Row(
-            children: [
-              Icon(Icons.business, size: 16.sp, color: AppColors.iconColor),
-              SizedBox(width: 4.w),
-              Text(
-                analysis["year_completed"]?.toString() ?? "N/A",
-                style: GoogleFonts.inter(
-                  color: AppColors.iconColor,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
+          // Description
+          Text(
+            analysis["historical_overview"] ?? "No description available.",
+            style: GoogleFonts.inter(
+              color: AppColors.textColor1,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+            ),
           ),
+
+          SizedBox(height: 24.h),
+
+          // Location Section
+          _buildSection(
+            "Location",
+            analysis["location"] ?? "Unknown location details.",
+            Icons.location_on,
+          ),
+
+          SizedBox(height: 16.h),
+
+          // Construction Section
+          _buildSection(
+              "Construction",
+              analysis["materials"] ?? "No construction details available.",
+              Icons.construction,
+            ),
+
+          SizedBox(height: 16.h),
+          // Architecture Section
+          _buildSection(
+              "Architecture",
+              analysis["architectural_style"] ?? "No architecture details available.",
+              Icons.architecture,
+            ),
+
+          SizedBox(height: 24.h),
         ],
       ),
 
-      SizedBox(width: double.infinity, child: Divider(color: AppColors.disabled1, height: 32.h)),
-      SizedBox(height: 5.h),
-
-      // Description
-      Text(
-        analysis["historical_overview"] ?? "No description available.",
-        style: GoogleFonts.inter(
-          color: AppColors.textColor1,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w400,
-          height: 1.5,
+      // Loader overlay
+      if (isLoading)
+        Container(
+          color: Colors.black.withOpacity(0.4),
+          alignment: Alignment.center,
+          child: const CircularProgressIndicator(
+            color: Colors.white,
+          ),
         ),
-      ),
-
-      SizedBox(height: 24.h),
-
-      // Location Section
-      _buildSection(
-        "Location",
-        analysis["location"] ?? "Unknown location details.",
-        Icons.location_on,
-      ),
-
-      SizedBox(height: 16.h),
-
-      // Construction Section
-      _buildSection(
-          "Construction",
-          analysis["materials"] ?? "No construction details available.",
-          Icons.construction,
-        ),
-
-      SizedBox(height: 16.h),
-      // Architecture Section
-      _buildSection(
-          "Architecture",
-          analysis["architectural_style"] ?? "No architecture details available.",
-          Icons.architecture,
-        ),
-
-      SizedBox(height: 24.h),
     ],
   );
 }
