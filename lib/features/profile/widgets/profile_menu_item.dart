@@ -32,8 +32,8 @@ class ProfileMenuItem extends StatelessWidget {
                   width: 20.w,
                   height: 20.w,
                   decoration: BoxDecoration(
-                    // color: AppColors.disabled1,
-                    color: Colors.transparent,
+                     color: AppColors.disabled1,
+                    //color: Colors.transparent,
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Icon(
@@ -62,8 +62,8 @@ class ProfileMenuItem extends StatelessWidget {
                   width: 24.w,
                   height: 24.w,
                   decoration: BoxDecoration(
-                    // color: AppColors.disabled1,
-                    color: Colors.transparent,
+                    color: AppColors.disabled1,
+                    //color: Colors.transparent,
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: Icon(
