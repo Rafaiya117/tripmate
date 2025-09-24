@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:trip_mate/config/app_route/router.dart';
@@ -21,6 +22,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await EasyLocalization.ensureInitialized();
+  await _initLocationPermission();
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en','US'),Locale('zh','CN'), Locale('zh','TW')],
@@ -29,6 +31,25 @@ void main() async {
       child: MyApp(),
     )
   );
+}
+
+Future<void> _initLocationPermission() async {
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    debugPrint("❌ Location services are disabled.");
+    return;
+  }
+
+  LocationPermission permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    debugPrint("❌ Location permissions are permanently denied.");
+    // Optional: Show dialog guiding user to enable in settings
+  }
 }
 
 class MyApp extends StatefulWidget {

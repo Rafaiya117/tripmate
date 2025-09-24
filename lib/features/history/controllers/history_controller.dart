@@ -22,7 +22,6 @@ class HistoryController extends ChangeNotifier {
   Baseurl base = Baseurl();
   
   HistoryController() {
-    debugPrint("!=======Card $_token");
     _loadMockData();
   }
 
@@ -200,12 +199,13 @@ class HistoryController extends ChangeNotifier {
     final dio = Dio();
 
     final response = await dio.delete(
-      "${Baseurl.baseUrl}/api/scans/$id/delete",
+      "${Baseurl.baseUrl}/api/scans/$id/delete/",
       options: Options(
         headers: {
           "Authorization": "Bearer $_token",
           "Accept": "application/json",
         },
+        validateStatus: (status) => true,
       ),
     );
 

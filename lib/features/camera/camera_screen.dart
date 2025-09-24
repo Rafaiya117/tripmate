@@ -62,6 +62,34 @@ class _CameraScreenState extends State<CameraScreen>
     });
   }
 
+
+  void _showLimitPopup(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Limit Reached"),
+        content: const Text(
+          "You’ve used all 3 free scans.\nUpgrade to premium to continue.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.push("/subscription"); 
+            },
+            child: const Text("Upgrade"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Consumer3<CameraUIController, TripMateCameraController, AuthService>(
@@ -210,11 +238,7 @@ class _CameraScreenState extends State<CameraScreen>
     );
   }
 
-  Widget _buildCameraControls(
-    BuildContext context,
-    TripMateCameraController cameraController,
-    AuthService authService,
-  ) {
+  Widget _buildCameraControls(BuildContext context,TripMateCameraController cameraController,AuthService authService,) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -230,7 +254,7 @@ class _CameraScreenState extends State<CameraScreen>
           child: IconButton(
             icon: Icon(Icons.panorama, size: 18.sp, color: Colors.white),
             onPressed: () {
-              cameraController.openGallery();
+              cameraController.openGallery(context);
             },
             padding: EdgeInsets.zero,
           ),
@@ -255,39 +279,54 @@ class _CameraScreenState extends State<CameraScreen>
                 left: 4.w,
                 top: 4.w,
                 child: GestureDetector(
-                  onTap: cameraController.isCapturing
-                    ? null: () async {
-                      try {
-                      // 1️⃣ Check if user is authenticated
-                      if (!authService.isAuthenticated()) {
-                      // Capture photo first
-                      await cameraController.capturePhoto();
-                      if (cameraController.lastCapturedImage != null) {
-                      // Store the captured image path for after login
-                      await authService.setPendingImagePath(
-                        cameraController.lastCapturedImage!,);
-                        // Reset camera state
-                        cameraController.resetCameraState();
-                        // Navigate to login page
-                        context.push('/login_page');
-                      }
-                      return;
-                    }
-                    // 2️⃣ Capture photo
-                    await cameraController.capturePhoto();
-                      if (cameraController.lastCapturedImage != null) {
-                        final capturedFile = cameraController.lastCapturedFile;
-                          if (capturedFile != null) {
-                             final imagePath = capturedFile.path;
-                              // Pass file path as query parameter
-                                context.go('/image_view?imagePath=${Uri.encodeComponent(imagePath)}',);
+                onTap: cameraController.isCapturing
+                  ? null
+                  : () async {
+                    try {
+                            // 1️⃣ Check if user is authenticated
+                            if (!authService.isAuthenticated()) {
+                              // Capture photo first
+                              await cameraController.capturePhoto();
+
+                              if (cameraController.lastCapturedImage != null) {
+                                // Store the captured image path for after login
+                                await authService.setPendingImagePath(
+                                  cameraController.lastCapturedImage!,
+                                );
+                                // Reset camera state
+                                cameraController.resetCameraState();
+                                // Navigate to login page
+                                context.push('/login_page');
+                              }
+                              return; // Stop further execution until login
+                            }
+
+                            // 2️⃣ Check free scan limit for logged-in user
+                            if (authService.hasReachedFreeLimit()) {
+                              _showLimitPopup(context);
+                              return; // Stop capture if limit reached
+                            }
+
+                            // 3️⃣ Capture photo normally
+                            await cameraController.capturePhoto();
+
+                            if (cameraController.lastCapturedImage != null) {
+                              final capturedFile =
+                                  cameraController.lastCapturedFile;
+                              if (capturedFile != null) {
+                                final imagePath = capturedFile.path;
+                                // Navigate to image view
+                                context.go(
+                                  '/image_view?imagePath=${Uri.encodeComponent(imagePath)}',
+                                );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text("No captured image available",),
+                                    content: Text(
+                                      "No captured image available",
+                                    ),
                                   ),
                                 );
-                                print('No captured image available');
                               }
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -297,18 +336,17 @@ class _CameraScreenState extends State<CameraScreen>
                                   ),
                                 ),
                               );
-                              print('❌ No captured image available');
                             }
                           } catch (e) {
-                  // Catch any unexpected errors
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("🚨 Error: ${e.toString()}"),
-                    ),
-                  );
-                  cameraController.resetCameraState();
-                }
-              },
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text("🚨 Error: ${e.toString()}"),
+                              ),
+                            );
+                            cameraController.resetCameraState();
+                          }
+                        },
+
               child: Container(
                 width: 56.w,
                 height: 56.w,

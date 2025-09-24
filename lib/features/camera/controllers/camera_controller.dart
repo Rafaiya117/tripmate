@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trip_mate/features/auths/services/auth_service.dart';
@@ -111,7 +112,7 @@ class TripMateCameraController extends ChangeNotifier {
   }
 }
 
-Future<void> openGallery() async {
+Future<void> openGallery(BuildContext context) async {
   try {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -121,12 +122,34 @@ Future<void> openGallery() async {
       _lastCapturedImage = image.path;
       notifyListeners();
       print('🖼 Image selected from gallery: ${image.path}');
+
+      context.go(
+        '/image_view?imagePath=${Uri.encodeComponent(image.path)}',
+      );
     }
   } catch (e) {
     _errorMessage = 'Failed to open gallery: ${e.toString()}';
     notifyListeners();
   }
 }
+
+
+// Future<void> openGallery() async {
+//   try {
+//     final ImagePicker picker = ImagePicker();
+//     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+//     if (image != null) {
+//       _lastCapturedFile = image;
+//       _lastCapturedImage = image.path;
+//       notifyListeners();
+//       print('🖼 Image selected from gallery: ${image.path}');
+//     }
+//   } catch (e) {
+//     _errorMessage = 'Failed to open gallery: ${e.toString()}';
+//     notifyListeners();
+//   }
+// }
 
   // Open recent photos
   void openRecent() {

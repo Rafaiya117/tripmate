@@ -20,6 +20,10 @@ class AuthService extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get userId => _userId;
   String? get userEmail => _userEmail;
+  
+  Map<String, dynamic>? _user;
+  Map<String, dynamic>? get user => _user;
+
   String? get pendingImagePath => _pendingImagePath;
 
   String? _token;
@@ -163,7 +167,7 @@ Future<bool> sendOtp(String email) async {
         _isLoggedIn = true;
         _userId = data["user"]?["id"]?.toString();
         _userEmail = data["user"]?["email"]?.toString();
-
+        _user = response.data["user"];
         // Save both tokens
         _token = data["access"]?.toString();
         _refreshToken = data["refresh"]?.toString();
@@ -340,5 +344,9 @@ Future<bool> sendOtp(String email) async {
     } catch (e) {
       print('Error clearing auth data: $e');
     }
+  }
+
+  bool hasReachedFreeLimit() {
+  return (user != null &&(user?["free_scans_used"] ?? 0) >= 3 && (user?["is_active_premium"] == false));
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:trip_mate/features/auths/controllers/ui_controller.dart';
 import 'package:trip_mate/features/camera/controllers/scan_controller.dart';
 import 'package:trip_mate/features/camera/custom_widget/custome_circle_indigator_widget.dart';
 
@@ -67,9 +68,9 @@ class _ImageViewScreenState extends State<ImageViewScreen> {
   // }
   void _navigateToHistoryDetails() async {
   final scanController = context.read<ScanController>();
-
+  final uiController = context.read<UIController>();
   try {
-    await scanController.uploadScan(widget.imagePath);
+    await scanController.uploadScan(widget.imagePath, language:uiController.selectedLang);
 
     if (scanController.lastScanResult != null) {
       final scanId = scanController.lastScanResult!['id'].toString();
